@@ -1,0 +1,232 @@
+{
+  "x": 8,
+  "rho_partition": "state_category",
+  "folds": [
+    {
+      "train_origins": 32,
+      "validation_origins": 8
+    },
+    {
+      "train_origins": 40,
+      "validation_origins": 8
+    },
+    {
+      "train_origins": 48,
+      "validation_origins": 8
+    },
+    {
+      "train_origins": 56,
+      "validation_origins": 8
+    }
+  ],
+  "models": [
+    "baseline",
+    "holiday_only",
+    "snap_only",
+    "both"
+  ],
+  "events": [
+    "Pesach End",
+    "OrthodoxEaster",
+    "Cinco De Mayo",
+    "Mother's day"
+  ],
+  "selected_model_by_validation": "both",
+  "selected_forecast_path": "forecast_both.csv",
+  "model_selection": {
+    "validation_origins": 32,
+    "rule": "lowest mean 12-level rolling WRMSSE; ties prefer baseline, holiday_only, snap_only, then both",
+    "selection_completed_before_holdout_read": true
+  },
+  "event_target_occurrences": {
+    "Pesach End": {
+      "all_rolling_occurrences": 4,
+      "development_occurrences": 2
+    },
+    "OrthodoxEaster": {
+      "all_rolling_occurrences": 4,
+      "development_occurrences": 2
+    },
+    "Cinco De Mayo": {
+      "all_rolling_occurrences": 4,
+      "development_occurrences": 2
+    },
+    "Mother's day": {
+      "all_rolling_occurrences": 4,
+      "development_occurrences": 2
+    }
+  },
+  "final_event_exposure_units": {
+    "Pesach End": 144477.63746903092,
+    "OrthodoxEaster": 172855.3298109658,
+    "Cinco De Mayo": 146839.64820646495,
+    "Mother's day": 170455.77003409714
+  },
+  "ridge": {
+    "lambda_beta": 2.0,
+    "gamma_ridge_multiplier": 1.0,
+    "gamma_penalty_rule": "lambda_gamma,e = multiplier × sum of zero-coefficient both-model forecast units on that event's fit dates"
+  },
+  "parameterization": "target multiplier exp(beta_g * SNAP + sum(gamma_e * event_e)); prior SNAP history is divided by exp(beta_g * SNAP); holiday reference days are skipped and available weights renormalized.",
+  "no_interactions_or_group_intercepts": true,
+  "final_fit_origins": 64,
+  "forecast_origin": 1913,
+  "forecast_days": [
+    1914,
+    1941
+  ],
+  "holdout_use": "Descriptive WRMSSE computed after forecasts were frozen and written; holdout is not used for parameter fitting or model selection.",
+  "fixed_ridge_and_bounds": {
+    "lambda_beta": 2.0,
+    "gamma_ridge_multiplier": 1.0,
+    "log_multiplier_bounds": [
+      -0.7,
+      0.7
+    ],
+    "selection": "predeclared values, not tuned to validation or holdout",
+    "local_quadratic_shrinkage_approximation": "at multiplier 1, event log effects are shrunk to about one third of an unpenalized estimate when Poisson curvature is close to the baseline event exposure"
+  },
+  "holiday_penalty_sensitivity": "final training coefficients also saved for multipliers 0.1 and 0.0; descriptive only, not used for model selection or holdout tuning",
+  "zero_reference_rule": "If a leaf weekday has no released non-holiday historical reference after filtering, its profile and forecast are zero; no fallback is applied.",
+  "final_no_reference_leaf_weekday_counts_by_model": {
+    "baseline": 0,
+    "holiday_only": 0,
+    "snap_only": 0,
+    "both": 0
+  },
+  "fold_event_fit_occurrences": [
+    {
+      "fold": 1,
+      "event": "Pesach End",
+      "fit_target_occurrences": 2,
+      "fit_origins": 32
+    },
+    {
+      "fold": 1,
+      "event": "OrthodoxEaster",
+      "fit_target_occurrences": 2,
+      "fit_origins": 32
+    },
+    {
+      "fold": 1,
+      "event": "Cinco De Mayo",
+      "fit_target_occurrences": 2,
+      "fit_origins": 32
+    },
+    {
+      "fold": 1,
+      "event": "Mother's day",
+      "fit_target_occurrences": 2,
+      "fit_origins": 32
+    },
+    {
+      "fold": 2,
+      "event": "Pesach End",
+      "fit_target_occurrences": 3,
+      "fit_origins": 40
+    },
+    {
+      "fold": 2,
+      "event": "OrthodoxEaster",
+      "fit_target_occurrences": 3,
+      "fit_origins": 40
+    },
+    {
+      "fold": 2,
+      "event": "Cinco De Mayo",
+      "fit_target_occurrences": 3,
+      "fit_origins": 40
+    },
+    {
+      "fold": 2,
+      "event": "Mother's day",
+      "fit_target_occurrences": 3,
+      "fit_origins": 40
+    },
+    {
+      "fold": 3,
+      "event": "Pesach End",
+      "fit_target_occurrences": 3,
+      "fit_origins": 48
+    },
+    {
+      "fold": 3,
+      "event": "OrthodoxEaster",
+      "fit_target_occurrences": 3,
+      "fit_origins": 48
+    },
+    {
+      "fold": 3,
+      "event": "Cinco De Mayo",
+      "fit_target_occurrences": 3,
+      "fit_origins": 48
+    },
+    {
+      "fold": 3,
+      "event": "Mother's day",
+      "fit_target_occurrences": 3,
+      "fit_origins": 48
+    },
+    {
+      "fold": 4,
+      "event": "Pesach End",
+      "fit_target_occurrences": 4,
+      "fit_origins": 56
+    },
+    {
+      "fold": 4,
+      "event": "OrthodoxEaster",
+      "fit_target_occurrences": 4,
+      "fit_origins": 56
+    },
+    {
+      "fold": 4,
+      "event": "Cinco De Mayo",
+      "fit_target_occurrences": 4,
+      "fit_origins": 56
+    },
+    {
+      "fold": 4,
+      "event": "Mother's day",
+      "fit_target_occurrences": 4,
+      "fit_origins": 56
+    }
+  ],
+  "holdout_scores": [
+    {
+      "model": "baseline",
+      "holdout_wrmsse_descriptive": 0.7369885241780126
+    },
+    {
+      "model": "holiday_only",
+      "holdout_wrmsse_descriptive": 0.7194109823271119
+    },
+    {
+      "model": "snap_only",
+      "holdout_wrmsse_descriptive": 0.6862972808144061
+    },
+    {
+      "model": "both",
+      "holdout_wrmsse_descriptive": 0.6613589913290072
+    }
+  ],
+  "overlap_days": {
+    "days": [],
+    "event_counts": []
+  },
+  "historical_overlap_check": {
+    "date": "2013-05-05",
+    "d_num": 828,
+    "OrthodoxEaster": true,
+    "Cinco De Mayo": true
+  },
+  "invariants": {
+    "zero_snap_coefficients_exact_rho_baseline": true,
+    "zero_event_coefficients_equal_holiday_filtered_reference": true,
+    "max_abs_difference_from_existing_rho_forecast": 0.0,
+    "nonnegative_forecasts": true,
+    "28_day_order_preserved": true,
+    "overlap_composition_probe_passed": true,
+    "future_data_leakage": false
+  }
+}

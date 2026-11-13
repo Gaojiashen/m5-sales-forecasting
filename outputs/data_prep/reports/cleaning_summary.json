@@ -1,0 +1,24 @@
+{
+  "sales": {
+    "rows": 30490,
+    "days": 1913,
+    "matrix_dtype": "uint16"
+  },
+  "calendar": {
+    "rows": 1969,
+    "training_start": "2011-01-29",
+    "training_end": "2016-04-24",
+    "days_with_event_in_training": 154
+  },
+  "prices": {
+    "rows": 6841121,
+    "minimum_price": 0.009999999776482582,
+    "maximum_price": 107.31999969482422
+  },
+  "decisions": [
+    "销量 0 保持为 0；不删除零销量日",
+    "日历事件空值表示无已记录事件；保留为空",
+    "未出现的商品-门店-周售价不补值；将来建模时须单独判断原因",
+    "只使用 sales_train_validation.csv 的 d_1 至 d_1913；不读取 evaluation 销量"
+  ]
+}

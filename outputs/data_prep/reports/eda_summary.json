@@ -1,0 +1,74 @@
+{
+  "source_days": [
+    1,
+    1913
+  ],
+  "series": 30490,
+  "total_units": 65695409,
+  "overall_zero_cell_share": 0.6819627560783215,
+  "categories": [
+    {
+      "cat_id": "FOODS",
+      "series_count": 14370,
+      "total_units": 45089939,
+      "mean_daily_units": 23570.276529012022,
+      "mean_daily_units_per_series": 1.6402419296459305,
+      "zero_cell_share": 0.6202120349322167
+    },
+    {
+      "cat_id": "HOUSEHOLD",
+      "series_count": 10470,
+      "total_units": 14480670,
+      "mean_daily_units": 7569.61317302666,
+      "mean_daily_units_per_series": 0.7229812008621451,
+      "zero_cell_share": 0.7176956939175031
+    },
+    {
+      "cat_id": "HOBBIES",
+      "series_count": 5650,
+      "total_units": 6124800,
+      "mean_daily_units": 3201.6727652901204,
+      "mean_daily_units_per_series": 0.5666677460690479,
+      "zero_cell_share": 0.772800632838196
+    }
+  ],
+  "states": [
+    {
+      "state_id": "CA",
+      "series_count": 12196,
+      "total_units": 28675547,
+      "mean_daily_units": 14989.831155253529,
+      "mean_daily_units_per_series": 1.2290776611391874,
+      "zero_cell_share": 0.6620793119936661
+    },
+    {
+      "state_id": "TX",
+      "series_count": 9147,
+      "total_units": 18899006,
+      "mean_daily_units": 9879.250392054364,
+      "mean_daily_units_per_series": 1.0800536123378555,
+      "zero_cell_share": 0.6907226115858358
+    },
+    {
+      "state_id": "WI",
+      "series_count": 9147,
+      "total_units": 18120856,
+      "mean_daily_units": 9472.48092002091,
+      "mean_daily_units_per_series": 1.0355833519209479,
+      "zero_cell_share": 0.6997141593503473
+    }
+  ],
+  "price_example": {
+    "store_id": "WI_3",
+    "item_id": "FOODS_1_034",
+    "observed_weeks": 258,
+    "distinct_prices": 15,
+    "selection": "240 个等距候选序列中价格种类最多者；仅作展示"
+  },
+  "series_examples": {
+    "count": 3,
+    "selection": "每个品类在最近 365 天的每个自然月均至少有一天正销量；在合格序列中，按最近一年日均销量和零销量占比相对品类中位数的标准化绝对距离之和选最近者，完全并列时按 item_id、store_id、id 字典序确定。",
+    "daily_table": "example_series_daily.csv（最近 365 天实际日销量；预测区间不填入虚构值）"
+  },
+  "caution": "图表可用完整历史探索；建模回测须先切分时间，再计算特征。"
+}

@@ -1,0 +1,5 @@
+fold,selected_kappa,selected_candidate,mean_validation_wrmsse
+1,20.0,BLX,0.7227820190426346
+2,5.0,BLX,0.6918378389641955
+3,80.0,BLX,0.652686051937921
+4,80.0,BLX,0.7511042273348562

@@ -1,0 +1,5 @@
+model,holdout_wrmsse_descriptive
+baseline,0.7369885241780126
+holiday_only,0.7194109823271119
+snap_only,0.6862972808144061
+both,0.6613589913290072

@@ -1,0 +1,88 @@
+{
+  "folds": [
+    {
+      "train_origins": 32,
+      "validation_origins": 8
+    },
+    {
+      "train_origins": 40,
+      "validation_origins": 8
+    },
+    {
+      "train_origins": 48,
+      "validation_origins": 8
+    },
+    {
+      "train_origins": 56,
+      "validation_origins": 8
+    }
+  ],
+  "selected_kappa": 80.0,
+  "selected_candidate": "BLX",
+  "validation_mean_wrmsse": 0.7046271201772344,
+  "baseline_max_abs_parity_delta_vs_06": 7.875343832619563e-08,
+  "baseline_final_forecast_max_abs_delta_vs_06": 8.993117603495193e-06,
+  "final_weights": [
+    {
+      "reliability_bin": "0",
+      "expert": "B",
+      "weight": 0.39710281332855074
+    },
+    {
+      "reliability_bin": "0",
+      "expert": "L_perp",
+      "weight": 0.35198259037805285
+    },
+    {
+      "reliability_bin": "0",
+      "expert": "X",
+      "weight": 0.25091459629339635
+    },
+    {
+      "reliability_bin": "1-2",
+      "expert": "B",
+      "weight": 0.2843440212860541
+    },
+    {
+      "reliability_bin": "1-2",
+      "expert": "L_perp",
+      "weight": 0.7156559787139459
+    },
+    {
+      "reliability_bin": "1-2",
+      "expert": "X",
+      "weight": -1.1102230246251565e-16
+    },
+    {
+      "reliability_bin": ">=3",
+      "expert": "B",
+      "weight": 0.3389944309288152
+    },
+    {
+      "reliability_bin": ">=3",
+      "expert": "L_perp",
+      "weight": 0.6610055690711847
+    },
+    {
+      "reliability_bin": ">=3",
+      "expert": "X",
+      "weight": 1.1102230246251565e-16
+    }
+  ],
+  "holdout_wrmsse_descriptive": 0.653573333448597,
+  "forecast_days": [
+    1914,
+    1941
+  ],
+  "holdout_read_after_forecast_frozen": true,
+  "coefficient_source": "06 both and 04 state × category rho; fold-specific values during validation, final values for d_1914–d_1941",
+  "q_smoothing_pseudo_days": 28.0,
+  "kappa_grid": [
+    5.0,
+    20.0,
+    80.0
+  ],
+  "x_share_odds_cap": 20.0,
+  "nonnegative": true,
+  "coherent_leaf_aggregation": true
+}

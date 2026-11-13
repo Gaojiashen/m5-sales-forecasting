@@ -1,0 +1,769 @@
+origin_d,level,zero_scale_nodes,excluded_revenue_share
+121,Total,0,0.0
+121,State,0,0.0
+121,Store,0,0.0
+121,Category,0,0.0
+121,Department,0,0.0
+121,State × Category,0,0.0
+121,State × Department,0,0.0
+121,Store × Category,0,0.0
+121,Store × Department,0,0.0
+121,Item,1375,7.969014632625004e-05
+121,Item × State,4250,0.00010558000718341454
+121,Item × Store,15569,0.0001310701960890448
+149,Total,0,0.0
+149,State,0,0.0
+149,Store,0,0.0
+149,Category,0,0.0
+149,Department,0,0.0
+149,State × Category,0,0.0
+149,State × Department,0,0.0
+149,Store × Category,0,0.0
+149,Store × Department,0,0.0
+149,Item,1355,1.5187856741150085e-06
+149,Item × State,4186,7.604121562421184e-06
+149,Item × Store,15329,7.611766456661062e-05
+177,Total,0,0.0
+177,State,0,0.0
+177,Store,0,0.0
+177,Category,0,0.0
+177,Department,0,0.0
+177,State × Category,0,0.0
+177,State × Department,0,0.0
+177,Store × Category,0,0.0
+177,Store × Department,0,0.0
+177,Item,1331,1.1102230246251565e-16
+177,Item × State,4124,2.5467259943678933e-05
+177,Item × Store,15103,0.0001138904203215052
+205,Total,0,0.0
+205,State,0,0.0
+205,Store,0,0.0
+205,Category,0,0.0
+205,Department,0,0.0
+205,State × Category,0,0.0
+205,State × Department,0,0.0
+205,Store × Category,0,0.0
+205,Store × Department,0,0.0
+205,Item,1303,7.028015420362799e-05
+205,Item × State,4015,7.271874387071442e-05
+205,Item × Store,14744,8.516530553115409e-05
+233,Total,0,0.0
+233,State,0,0.0
+233,Store,0,0.0
+233,Category,0,0.0
+233,Department,0,0.0
+233,State × Category,0,0.0
+233,State × Department,0,0.0
+233,Store × Category,0,0.0
+233,Store × Department,0,0.0
+233,Item,1279,0.0
+233,Item × State,3940,1.195359618844094e-05
+233,Item × Store,14463,6.447638318751725e-05
+261,Total,0,0.0
+261,State,0,0.0
+261,Store,0,0.0
+261,Category,0,0.0
+261,Department,0,0.0
+261,State × Category,0,0.0
+261,State × Department,0,0.0
+261,Store × Category,0,0.0
+261,Store × Department,0,0.0
+261,Item,1251,-2.220446049250313e-16
+261,Item × State,3864,7.018041802142605e-07
+261,Item × Store,14172,3.094020696681188e-05
+289,Total,0,0.0
+289,State,0,0.0
+289,Store,0,0.0
+289,Category,0,0.0
+289,Department,0,0.0
+289,State × Category,0,0.0
+289,State × Department,0,0.0
+289,Store × Category,0,0.0
+289,Store × Department,0,0.0
+289,Item,1235,-2.220446049250313e-16
+289,Item × State,3819,0.0
+289,Item × Store,14022,1.2481109820994263e-05
+317,Total,0,0.0
+317,State,0,0.0
+317,Store,0,0.0
+317,Category,0,0.0
+317,Department,0,0.0
+317,State × Category,0,0.0
+317,State × Department,0,0.0
+317,Store × Category,0,0.0
+317,Store × Department,0,0.0
+317,Item,1228,0.0
+317,Item × State,3789,-2.220446049250313e-16
+317,Item × Store,13908,1.5644244695356413e-05
+345,Total,0,0.0
+345,State,0,0.0
+345,Store,0,0.0
+345,Category,0,0.0
+345,Department,0,0.0
+345,State × Category,0,0.0
+345,State × Department,0,0.0
+345,Store × Category,0,0.0
+345,Store × Department,0,0.0
+345,Item,1199,-2.220446049250313e-16
+345,Item × State,3721,4.7482674172871775e-05
+345,Item × Store,13723,0.0001190075714184724
+373,Total,0,0.0
+373,State,0,0.0
+373,Store,0,0.0
+373,Category,0,0.0
+373,Department,0,0.0
+373,State × Category,0,0.0
+373,State × Department,0,0.0
+373,Store × Category,0,0.0
+373,Store × Department,0,0.0
+373,Item,1138,1.8678008769978938e-05
+373,Item × State,3560,3.6765426386198286e-05
+373,Item × Store,13245,0.00012185563578126501
+401,Total,0,0.0
+401,State,0,0.0
+401,Store,0,0.0
+401,Category,0,0.0
+401,Department,0,0.0
+401,State × Category,0,0.0
+401,State × Department,0,0.0
+401,Store × Category,0,0.0
+401,Store × Department,0,0.0
+401,Item,1079,4.14627457165917e-05
+401,Item × State,3363,7.151861819398864e-05
+401,Item × Store,12608,0.00015845351851362377
+429,Total,0,0.0
+429,State,0,0.0
+429,Store,0,0.0
+429,Category,0,0.0
+429,Department,0,0.0
+429,State × Category,0,0.0
+429,State × Department,0,0.0
+429,Store × Category,0,0.0
+429,Store × Department,0,0.0
+429,Item,1027,7.4242346559394434e-06
+429,Item × State,3193,1.9852029138789362e-05
+429,Item × Store,12023,4.290251007044166e-05
+457,Total,0,0.0
+457,State,0,0.0
+457,Store,0,0.0
+457,Category,0,0.0
+457,Department,0,0.0
+457,State × Category,0,0.0
+457,State × Department,0,0.0
+457,Store × Category,0,0.0
+457,Store × Department,0,0.0
+457,Item,978,3.774028403014107e-06
+457,Item × State,3067,5.411973615943033e-05
+457,Item × Store,11681,0.00015343493997177493
+485,Total,0,0.0
+485,State,0,0.0
+485,Store,0,0.0
+485,Category,0,0.0
+485,Department,0,0.0
+485,State × Category,0,0.0
+485,State × Department,0,0.0
+485,Store × Category,0,0.0
+485,Store × Department,0,0.0
+485,Item,947,1.7465665528737517e-05
+485,Item × State,2941,4.163312949390097e-05
+485,Item × Store,11025,0.00011215982301349126
+513,Total,0,0.0
+513,State,0,0.0
+513,Store,0,0.0
+513,Category,0,0.0
+513,Department,0,0.0
+513,State × Category,0,0.0
+513,State × Department,0,0.0
+513,Store × Category,0,0.0
+513,Store × Department,0,0.0
+513,Item,926,3.3801615823003672e-06
+513,Item × State,2872,8.721419138879583e-06
+513,Item × Store,10744,1.5146737425197898e-05
+541,Total,0,0.0
+541,State,0,0.0
+541,Store,0,0.0
+541,Category,0,0.0
+541,Department,0,0.0
+541,State × Category,0,0.0
+541,State × Department,0,0.0
+541,Store × Category,0,0.0
+541,Store × Department,0,0.0
+541,Item,866,0.0
+541,Item × State,2702,8.248620614992319e-06
+541,Item × Store,10205,3.6634577258665146e-05
+569,Total,0,0.0
+569,State,0,0.0
+569,Store,0,0.0
+569,Category,0,0.0
+569,Department,0,0.0
+569,State × Category,0,0.0
+569,State × Department,0,0.0
+569,Store × Category,0,0.0
+569,Store × Department,0,0.0
+569,Item,840,3.382561238884918e-06
+569,Item × State,2612,9.763472973767229e-06
+569,Item × Store,9848,4.4963957133825616e-05
+597,Total,0,0.0
+597,State,0,0.0
+597,Store,0,0.0
+597,Category,0,0.0
+597,Department,0,0.0
+597,State × Category,0,0.0
+597,State × Department,0,0.0
+597,Store × Category,0,0.0
+597,Store × Department,0,0.0
+597,Item,815,6.432686706414614e-06
+597,Item × State,2554,1.8883525647717114e-05
+597,Item × Store,9631,2.994271314948893e-05
+625,Total,0,0.0
+625,State,0,0.0
+625,Store,0,0.0
+625,Category,0,0.0
+625,Department,0,0.0
+625,State × Category,0,0.0
+625,State × Department,0,0.0
+625,Store × Category,0,0.0
+625,Store × Department,0,0.0
+625,Item,805,1.5311920918970046e-06
+625,Item × State,2513,1.5311920918970046e-06
+625,Item × Store,9500,1.5311920921190492e-06
+653,Total,0,0.0
+653,State,0,0.0
+653,Store,0,0.0
+653,Category,0,0.0
+653,Department,0,0.0
+653,State × Category,0,0.0
+653,State × Department,0,0.0
+653,Store × Category,0,0.0
+653,Store × Department,0,0.0
+653,Item,784,0.0
+653,Item × State,2447,1.1892730502616189e-06
+653,Item × Store,8994,1.1480289006216005e-05
+681,Total,0,0.0
+681,State,0,0.0
+681,Store,0,0.0
+681,Category,0,0.0
+681,Department,0,0.0
+681,State × Category,0,0.0
+681,State × Department,0,0.0
+681,Store × Category,0,0.0
+681,Store × Department,0,0.0
+681,Item,760,1.4138994586576636e-05
+681,Item × State,2390,1.9733153679868387e-05
+681,Item × Store,8816,2.755042512969652e-05
+709,Total,0,0.0
+709,State,0,0.0
+709,Store,0,0.0
+709,Category,0,0.0
+709,Department,0,0.0
+709,State × Category,0,0.0
+709,State × Department,0,0.0
+709,Store × Category,0,0.0
+709,Store × Department,0,0.0
+709,Item,738,7.70255869109171e-06
+709,Item × State,2324,6.918038824244022e-06
+709,Item × Store,8597,1.7053401546007763e-05
+737,Total,0,0.0
+737,State,0,0.0
+737,Store,0,0.0
+737,Category,0,0.0
+737,Department,0,0.0
+737,State × Category,0,0.0
+737,State × Department,0,0.0
+737,Store × Category,0,0.0
+737,Store × Department,0,0.0
+737,Item,704,8.471107819540968e-06
+737,Item × State,2214,2.0127568397310114e-05
+737,Item × Store,8245,5.1046725835335316e-05
+765,Total,0,0.0
+765,State,0,0.0
+765,Store,0,0.0
+765,Category,0,0.0
+765,Department,0,0.0
+765,State × Category,0,0.0
+765,State × Department,0,0.0
+765,Store × Category,0,0.0
+765,Store × Department,0,0.0
+765,Item,644,6.344466079499789e-06
+765,Item × State,2031,3.809518334929596e-05
+765,Item × Store,7672,7.927389076023417e-05
+793,Total,0,0.0
+793,State,0,0.0
+793,Store,0,0.0
+793,Category,0,0.0
+793,Department,0,0.0
+793,State × Category,0,0.0
+793,State × Department,0,0.0
+793,Store × Category,0,0.0
+793,Store × Department,0,0.0
+793,Item,612,2.0390506315637325e-06
+793,Item × State,1936,7.140357807133846e-06
+793,Item × Store,7284,3.232300116662312e-05
+821,Total,0,0.0
+821,State,0,0.0
+821,Store,0,0.0
+821,Category,0,0.0
+821,Department,0,0.0
+821,State × Category,0,0.0
+821,State × Department,0,0.0
+821,Store × Category,0,0.0
+821,Store × Department,0,0.0
+821,Item,558,4.463170222290813e-06
+821,Item × State,1772,7.726442922129095e-06
+821,Item × Store,6828,3.8325698732966096e-05
+849,Total,0,0.0
+849,State,0,0.0
+849,Store,0,0.0
+849,Category,0,0.0
+849,Department,0,0.0
+849,State × Category,0,0.0
+849,State × Department,0,0.0
+849,Store × Category,0,0.0
+849,Store × Department,0,0.0
+849,Item,529,4.790410204624784e-06
+849,Item × State,1679,8.253267229973993e-06
+849,Item × Store,6439,2.1741955448351113e-05
+877,Total,0,0.0
+877,State,0,0.0
+877,Store,0,0.0
+877,Category,0,0.0
+877,Department,0,0.0
+877,State × Category,0,0.0
+877,State × Department,0,0.0
+877,Store × Category,0,0.0
+877,Store × Department,0,0.0
+877,Item,514,0.0
+877,Item × State,1617,0.0
+877,Item × Store,6195,2.815492240348938e-06
+905,Total,0,0.0
+905,State,0,0.0
+905,Store,0,0.0
+905,Category,0,0.0
+905,Department,0,0.0
+905,State × Category,0,0.0
+905,State × Department,0,0.0
+905,Store × Category,0,0.0
+905,Store × Department,0,0.0
+905,Item,474,1.1102230246251565e-16
+905,Item × State,1508,4.967181119763797e-05
+905,Item × Store,5860,9.742449212302162e-05
+933,Total,0,0.0
+933,State,0,0.0
+933,Store,0,0.0
+933,Category,0,0.0
+933,Department,0,0.0
+933,State × Category,0,0.0
+933,State × Department,0,0.0
+933,Store × Category,0,0.0
+933,Store × Department,0,0.0
+933,Item,459,1.1102230246251565e-16
+933,Item × State,1441,0.0
+933,Item × Store,5580,6.034539438593001e-06
+961,Total,0,0.0
+961,State,0,0.0
+961,Store,0,0.0
+961,Category,0,0.0
+961,Department,0,0.0
+961,State × Category,0,0.0
+961,State × Department,0,0.0
+961,Store × Category,0,0.0
+961,Store × Department,0,0.0
+961,Item,425,-2.220446049250313e-16
+961,Item × State,1342,2.5271196877674207e-05
+961,Item × Store,5275,5.2294201608016344e-05
+989,Total,0,0.0
+989,State,0,0.0
+989,Store,0,0.0
+989,Category,0,0.0
+989,Department,0,0.0
+989,State × Category,0,0.0
+989,State × Department,0,0.0
+989,Store × Category,0,0.0
+989,Store × Department,0,0.0
+989,Item,410,0.0
+989,Item × State,1284,1.3530285138951825e-06
+989,Item × Store,5004,2.3500152461553014e-05
+1017,Total,0,0.0
+1017,State,0,0.0
+1017,Store,0,0.0
+1017,Category,0,0.0
+1017,Department,0,0.0
+1017,State × Category,0,0.0
+1017,State × Department,0,0.0
+1017,Store × Category,0,0.0
+1017,Store × Department,0,0.0
+1017,Item,400,0.0
+1017,Item × State,1249,2.1384990360751033e-06
+1017,Item × Store,4869,9.458193723554942e-06
+1045,Total,0,0.0
+1045,State,0,0.0
+1045,Store,0,0.0
+1045,Category,0,0.0
+1045,Department,0,0.0
+1045,State × Category,0,0.0
+1045,State × Department,0,0.0
+1045,Store × Category,0,0.0
+1045,Store × Department,0,0.0
+1045,Item,391,5.25180840460493e-06
+1045,Item × State,1221,5.251808404382885e-06
+1045,Item × Store,4773,5.25180840460493e-06
+1073,Total,0,0.0
+1073,State,0,0.0
+1073,Store,0,0.0
+1073,Category,0,0.0
+1073,Department,0,0.0
+1073,State × Category,0,0.0
+1073,State × Department,0,0.0
+1073,Store × Category,0,0.0
+1073,Store × Department,0,0.0
+1073,Item,358,1.524940018482468e-06
+1073,Item × State,1138,3.400616241233667e-05
+1073,Item × Store,4552,0.0003055674809041564
+1101,Total,0,0.0
+1101,State,0,0.0
+1101,Store,0,0.0
+1101,Category,0,0.0
+1101,Department,0,0.0
+1101,State × Category,0,0.0
+1101,State × Department,0,0.0
+1101,Store × Category,0,0.0
+1101,Store × Department,0,0.0
+1101,Item,322,1.3724085351052295e-05
+1101,Item × State,1021,1.936875988506337e-05
+1101,Item × Store,4179,3.378525864583537e-05
+1129,Total,0,0.0
+1129,State,0,0.0
+1129,Store,0,0.0
+1129,Category,0,0.0
+1129,Department,0,0.0
+1129,State × Category,0,0.0
+1129,State × Department,0,0.0
+1129,Store × Category,0,0.0
+1129,Store × Department,0,0.0
+1129,Item,268,0.0
+1129,Item × State,859,4.146589955733582e-06
+1129,Item × Store,3662,7.814861020094543e-05
+1157,Total,0,0.0
+1157,State,0,0.0
+1157,Store,0,0.0
+1157,Category,0,0.0
+1157,Department,0,0.0
+1157,State × Category,0,0.0
+1157,State × Department,0,0.0
+1157,Store × Category,0,0.0
+1157,Store × Department,0,0.0
+1157,Item,214,0.0
+1157,Item × State,696,8.043969046633848e-06
+1157,Item × Store,3116,2.6549283786758693e-05
+1185,Total,0,0.0
+1185,State,0,0.0
+1185,Store,0,0.0
+1185,Category,0,0.0
+1185,Department,0,0.0
+1185,State × Category,0,0.0
+1185,State × Department,0,0.0
+1185,Store × Category,0,0.0
+1185,Store × Department,0,0.0
+1185,Item,183,0.0
+1185,Item × State,604,2.6005212704349745e-06
+1185,Item × Store,2800,3.5496438122284424e-05
+1213,Total,0,0.0
+1213,State,0,0.0
+1213,Store,0,0.0
+1213,Category,0,0.0
+1213,Department,0,0.0
+1213,State × Category,0,0.0
+1213,State × Department,0,0.0
+1213,Store × Category,0,0.0
+1213,Store × Department,0,0.0
+1213,Item,165,1.3729075282187253e-06
+1213,Item × State,535,1.37290752844077e-06
+1213,Item × Store,2483,1.352243869046088e-05
+1241,Total,0,0.0
+1241,State,0,0.0
+1241,Store,0,0.0
+1241,Category,0,0.0
+1241,Department,0,0.0
+1241,State × Category,0,0.0
+1241,State × Department,0,0.0
+1241,Store × Category,0,0.0
+1241,Store × Department,0,0.0
+1241,Item,136,0.0
+1241,Item × State,452,1.4214712636406723e-05
+1241,Item × Store,2198,5.481263892170851e-05
+1269,Total,0,0.0
+1269,State,0,0.0
+1269,Store,0,0.0
+1269,Category,0,0.0
+1269,Department,0,0.0
+1269,State × Category,0,0.0
+1269,State × Department,0,0.0
+1269,Store × Category,0,0.0
+1269,Store × Department,0,0.0
+1269,Item,113,0.0
+1269,Item × State,388,4.34068258381437e-06
+1269,Item × Store,1968,4.570205457543608e-05
+1297,Total,0,0.0
+1297,State,0,0.0
+1297,Store,0,0.0
+1297,Category,0,0.0
+1297,Department,0,0.0
+1297,State × Category,0,0.0
+1297,State × Department,0,0.0
+1297,Store × Category,0,0.0
+1297,Store × Department,0,0.0
+1297,Item,93,2.3032063705130668e-06
+1297,Item × State,317,1.0545173561138377e-05
+1297,Item × Store,1737,3.1866185596696184e-05
+1325,Total,0,0.0
+1325,State,0,0.0
+1325,Store,0,0.0
+1325,Category,0,0.0
+1325,Department,0,0.0
+1325,State × Category,0,0.0
+1325,State × Department,0,0.0
+1325,Store × Category,0,0.0
+1325,Store × Department,0,0.0
+1325,Item,75,0.0
+1325,Item × State,254,8.594335695999433e-06
+1325,Item × Store,1529,1.97991469582659e-05
+1353,Total,0,0.0
+1353,State,0,0.0
+1353,Store,0,0.0
+1353,Category,0,0.0
+1353,Department,0,0.0
+1353,State × Category,0,0.0
+1353,State × Department,0,0.0
+1353,Store × Category,0,0.0
+1353,Store × Department,0,0.0
+1353,Item,63,6.656399371096633e-05
+1353,Item × State,226,8.38427716182144e-05
+1353,Item × Store,1388,0.00012952465744464625
+1381,Total,0,0.0
+1381,State,0,0.0
+1381,Store,0,0.0
+1381,Category,0,0.0
+1381,Department,0,0.0
+1381,State × Category,0,0.0
+1381,State × Department,0,0.0
+1381,Store × Category,0,0.0
+1381,Store × Department,0,0.0
+1381,Item,52,0.0
+1381,Item × State,180,-2.220446049250313e-16
+1381,Item × Store,1163,1.2892616291892978e-05
+1409,Total,0,0.0
+1409,State,0,0.0
+1409,Store,0,0.0
+1409,Category,0,0.0
+1409,Department,0,0.0
+1409,State × Category,0,0.0
+1409,State × Department,0,0.0
+1409,Store × Category,0,0.0
+1409,Store × Department,0,0.0
+1409,Item,45,0.0
+1409,Item × State,164,2.401819296227181e-06
+1409,Item × Store,1093,1.9799524685448766e-05
+1437,Total,0,0.0
+1437,State,0,0.0
+1437,Store,0,0.0
+1437,Category,0,0.0
+1437,Department,0,0.0
+1437,State × Category,0,0.0
+1437,State × Department,0,0.0
+1437,Store × Category,0,0.0
+1437,Store × Department,0,0.0
+1437,Item,20,1.3779548781012174e-05
+1437,Item × State,97,2.2014705632233955e-05
+1437,Item × Store,909,8.002901352666125e-05
+1465,Total,0,0.0
+1465,State,0,0.0
+1465,Store,0,0.0
+1465,Category,0,0.0
+1465,Department,0,0.0
+1465,State × Category,0,0.0
+1465,State × Department,0,0.0
+1465,Store × Category,0,0.0
+1465,Store × Department,0,0.0
+1465,Item,1,0.0
+1465,Item × State,29,1.3541829889662793e-06
+1465,Item × Store,666,9.364175369785954e-06
+1493,Total,0,0.0
+1493,State,0,0.0
+1493,Store,0,0.0
+1493,Category,0,0.0
+1493,Department,0,0.0
+1493,State × Category,0,0.0
+1493,State × Department,0,0.0
+1493,Store × Category,0,0.0
+1493,Store × Department,0,0.0
+1493,Item,1,0.0
+1493,Item × State,23,1.1102230246251565e-16
+1493,Item × Store,578,-2.220446049250313e-16
+1521,Total,0,0.0
+1521,State,0,0.0
+1521,Store,0,0.0
+1521,Category,0,0.0
+1521,Department,0,0.0
+1521,State × Category,0,0.0
+1521,State × Department,0,0.0
+1521,Store × Category,0,0.0
+1521,Store × Department,0,0.0
+1521,Item,1,1.1102230246251565e-16
+1521,Item × State,17,0.0
+1521,Item × Store,521,6.33469369593076e-06
+1549,Total,0,0.0
+1549,State,0,0.0
+1549,Store,0,0.0
+1549,Category,0,0.0
+1549,Department,0,0.0
+1549,State × Category,0,0.0
+1549,State × Department,0,0.0
+1549,Store × Category,0,0.0
+1549,Store × Department,0,0.0
+1549,Item,0,0.0
+1549,Item × State,9,1.1102230246251565e-16
+1549,Item × Store,428,-2.220446049250313e-16
+1577,Total,0,0.0
+1577,State,0,0.0
+1577,Store,0,0.0
+1577,Category,0,0.0
+1577,Department,0,0.0
+1577,State × Category,0,0.0
+1577,State × Department,0,0.0
+1577,Store × Category,0,0.0
+1577,Store × Department,0,0.0
+1577,Item,0,0.0
+1577,Item × State,9,0.0
+1577,Item × Store,391,3.6603760207309932e-06
+1605,Total,0,0.0
+1605,State,0,0.0
+1605,Store,0,0.0
+1605,Category,0,0.0
+1605,Department,0,0.0
+1605,State × Category,0,0.0
+1605,State × Department,0,0.0
+1605,Store × Category,0,0.0
+1605,Store × Department,0,0.0
+1605,Item,0,0.0
+1605,Item × State,7,1.1102230246251565e-16
+1605,Item × Store,159,0.0
+1633,Total,0,0.0
+1633,State,0,0.0
+1633,Store,0,0.0
+1633,Category,0,0.0
+1633,Department,0,0.0
+1633,State × Category,0,0.0
+1633,State × Department,0,0.0
+1633,Store × Category,0,0.0
+1633,Store × Department,0,0.0
+1633,Item,0,0.0
+1633,Item × State,7,1.1102230246251565e-16
+1633,Item × Store,142,1.472782270028894e-06
+1661,Total,0,0.0
+1661,State,0,0.0
+1661,Store,0,0.0
+1661,Category,0,0.0
+1661,Department,0,0.0
+1661,State × Category,0,0.0
+1661,State × Department,0,0.0
+1661,Store × Category,0,0.0
+1661,Store × Department,0,0.0
+1661,Item,0,0.0
+1661,Item × State,7,0.0
+1661,Item × Store,120,8.883433182949041e-06
+1689,Total,0,0.0
+1689,State,0,0.0
+1689,Store,0,0.0
+1689,Category,0,0.0
+1689,Department,0,0.0
+1689,State × Category,0,0.0
+1689,State × Department,0,0.0
+1689,Store × Category,0,0.0
+1689,Store × Department,0,0.0
+1689,Item,0,0.0
+1689,Item × State,5,-2.220446049250313e-16
+1689,Item × Store,94,2.3923237545409037e-06
+1717,Total,0,0.0
+1717,State,0,0.0
+1717,Store,0,0.0
+1717,Category,0,0.0
+1717,Department,0,0.0
+1717,State × Category,0,0.0
+1717,State × Department,0,0.0
+1717,Store × Category,0,0.0
+1717,Store × Department,0,0.0
+1717,Item,0,0.0
+1717,Item × State,2,0.0
+1717,Item × Store,62,9.543544348122879e-07
+1745,Total,0,0.0
+1745,State,0,0.0
+1745,Store,0,0.0
+1745,Category,0,0.0
+1745,Department,0,0.0
+1745,State × Category,0,0.0
+1745,State × Department,0,0.0
+1745,Store × Category,0,0.0
+1745,Store × Department,0,0.0
+1745,Item,0,0.0
+1745,Item × State,0,0.0
+1745,Item × Store,37,2.2043725428355643e-06
+1773,Total,0,0.0
+1773,State,0,0.0
+1773,Store,0,0.0
+1773,Category,0,0.0
+1773,Department,0,0.0
+1773,State × Category,0,0.0
+1773,State × Department,0,0.0
+1773,Store × Category,0,0.0
+1773,Store × Department,0,0.0
+1773,Item,0,0.0
+1773,Item × State,0,0.0
+1773,Item × Store,27,1.1102230246251565e-16
+1801,Total,0,0.0
+1801,State,0,0.0
+1801,Store,0,0.0
+1801,Category,0,0.0
+1801,Department,0,0.0
+1801,State × Category,0,0.0
+1801,State × Department,0,0.0
+1801,Store × Category,0,0.0
+1801,Store × Department,0,0.0
+1801,Item,0,0.0
+1801,Item × State,0,0.0
+1801,Item × Store,16,0.0
+1829,Total,0,0.0
+1829,State,0,0.0
+1829,Store,0,0.0
+1829,Category,0,0.0
+1829,Department,0,0.0
+1829,State × Category,0,0.0
+1829,State × Department,0,0.0
+1829,Store × Category,0,0.0
+1829,Store × Department,0,0.0
+1829,Item,0,0.0
+1829,Item × State,0,0.0
+1829,Item × Store,10,-2.220446049250313e-16
+1857,Total,0,0.0
+1857,State,0,0.0
+1857,Store,0,0.0
+1857,Category,0,0.0
+1857,Department,0,0.0
+1857,State × Category,0,0.0
+1857,State × Department,0,0.0
+1857,Store × Category,0,0.0
+1857,Store × Department,0,0.0
+1857,Item,0,0.0
+1857,Item × State,0,0.0
+1857,Item × Store,0,0.0
+1885,Total,0,0.0
+1885,State,0,0.0
+1885,Store,0,0.0
+1885,Category,0,0.0
+1885,Department,0,0.0
+1885,State × Category,0,0.0
+1885,State × Department,0,0.0
+1885,Store × Category,0,0.0
+1885,Store × Department,0,0.0
+1885,Item,0,0.0
+1885,Item × State,0,0.0
+1885,Item × Store,0,0.0

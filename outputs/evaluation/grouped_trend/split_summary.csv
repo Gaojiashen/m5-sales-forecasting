@@ -1,0 +1,11 @@
+split,model,phi,mean_wrmsse
+development,constant,,0.8409053262489166
+development,linear,1.0,0.907005895654906
+development,damped_selected,0.0,0.8601408767625149
+confirmation,constant,,0.7996328203641955
+confirmation,linear,1.0,0.8389739262804415
+confirmation,damped_selected,0.0,0.8124274954910953
+audit,constant,,0.7966901516430361
+audit,linear,1.0,0.8347855916315423
+audit,damped_selected,0.0,0.804160772488114
+confirmation_selection,constant,,0.7996328203641955

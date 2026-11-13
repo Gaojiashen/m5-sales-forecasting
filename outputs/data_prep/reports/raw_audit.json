@@ -1,0 +1,69 @@
+{
+  "source_directory": "D:\\HKUST\\5054minproject\\data\\m5-forecasting-accuracy",
+  "sales": {
+    "rows": 30490,
+    "columns": 1919,
+    "days": 1913,
+    "unique_ids": 30490,
+    "duplicate_ids": 0,
+    "missing_sales_cells": 0,
+    "infinite_sales_cells": 0,
+    "negative_sales_cells": 0,
+    "fractional_sales_cells": 0,
+    "zero_sales_ratio": 0.681963,
+    "minimum_sale": 0.0,
+    "maximum_sale": 763.0,
+    "stores": {
+      "CA_1": 3049,
+      "CA_2": 3049,
+      "CA_3": 3049,
+      "CA_4": 3049,
+      "TX_1": 3049,
+      "TX_2": 3049,
+      "TX_3": 3049,
+      "WI_1": 3049,
+      "WI_2": 3049,
+      "WI_3": 3049
+    },
+    "categories": {
+      "FOODS": 14370,
+      "HOBBIES": 5650,
+      "HOUSEHOLD": 10470
+    },
+    "states": {
+      "CA": 12196,
+      "TX": 9147,
+      "WI": 9147
+    },
+    "item_to_dept_violations": 0,
+    "dept_to_cat_violations": 0,
+    "store_to_state_violations": 0
+  },
+  "calendar": {
+    "rows": 1969,
+    "first_date": "2011-01-29",
+    "last_date": "2016-06-19",
+    "duplicate_days": 0,
+    "duplicate_dates": 0,
+    "discontinuities": 0,
+    "missing_training_days_count": 0,
+    "event_name_1_nonempty": 162
+  },
+  "prices": {
+    "rows": 6841121,
+    "unique_price_keys": 6841121,
+    "duplicate_price_keys": 0,
+    "missing": {
+      "store_id": 0,
+      "item_id": 0,
+      "wm_yr_wk": 0,
+      "sell_price": 0
+    },
+    "nonpositive_prices": 0,
+    "unique_stores": 10,
+    "unique_items": 3049,
+    "minimum_price": 0.009999999776482582,
+    "maximum_price": 107.31999969482422
+  },
+  "issues": []
+}

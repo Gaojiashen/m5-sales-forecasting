@@ -1,0 +1,5 @@
+model,mean_validation_wrmsse
+baseline,0.7988101613096108
+both,0.7317072320716131
+holiday_only,0.7925836837026021
+snap_only,0.7397476930623006

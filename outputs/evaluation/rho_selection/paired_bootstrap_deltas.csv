@@ -1,0 +1,9 @@
+partition,comparator,mean_delta,ci95_low,ci95_high,bootstrap_sd_mean_delta,bootstrap_reps,block_length_origins,note,bootstrap_sd_mean_wrmsse
+global,best,0.0004706954519960137,-3.696049493178734e-06,0.0008400275285343484,0.0002197649928530046,2000,4,Descriptive paired time-block interval; not a claim of statistical significance.,0.025552886212099436
+state,best,0.00016880324605676386,-0.0002424648350720751,0.00026032552423461205,0.00013020257858700776,2000,4,Descriptive paired time-block interval; not a claim of statistical significance.,0.025446530978975552
+state_category,best,0.0,0.0,0.0,0.0,2000,4,Descriptive paired time-block interval; not a claim of statistical significance.,0.025440696136906877
+store_category,best,8.717863839345641e-06,-0.0007510690673319581,0.0008003503075199918,0.0003983908411797743,2000,4,Descriptive paired time-block interval; not a claim of statistical significance.,0.025526368978086706
+global,global,0.0,0.0,0.0,0.0,2000,4,Descriptive paired time-block interval; not a claim of statistical significance.,0.025552886212099436
+state,global,0.0003018922059392498,2.571722791360016e-05,0.0007684970796776793,0.00019248372972892642,2000,4,Descriptive paired time-block interval; not a claim of statistical significance.,0.025446530978975552
+state_category,global,0.0004706954519960137,-3.696049493178734e-06,0.0008400275285343484,0.0002197649928530046,2000,4,Descriptive paired time-block interval; not a claim of statistical significance.,0.025440696136906877
+store_category,global,0.00046197758815666803,-0.00027466538564099093,0.0009973264271792633,0.00033726261780069007,2000,4,Descriptive paired time-block interval; not a claim of statistical significance.,0.025526368978086706

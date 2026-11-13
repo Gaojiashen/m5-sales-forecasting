@@ -1,0 +1,48 @@
+# Python 环境与缓存
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.pytest_cache/
+
+# 本地配置
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# 数据由使用者下载，处理后文件由脚本生成
+/data/*
+!/data/README.md
+
+# 历史资料、报告及演示制作文件
+/references/
+/requirements/
+/reports/
+/presentations/
+/.codex-presentation-build*/
+*.zip
+
+# 仅保留数据探索和正式实验目录中的结果
+/outputs/*
+!/outputs/README.md
+!/outputs/data_prep/
+!/outputs/evaluation/
+/outputs/data_prep/tables/
+/outputs/evaluation/champion_comparison/
+
+# 完整预测、日志、旧页面和重复格式图片由脚本重新生成
+/outputs/**/forecast*.csv
+/outputs/**/rho_x8_forecast.csv
+/outputs/**/grouped_trend_forecast.csv
+/outputs/**/snaive_predictions.csv
+/outputs/**/*.log
+/outputs/**/*.html
+/outputs/**/*.svg
+
+# 图形库运行时缓存
+**/mplconfig/

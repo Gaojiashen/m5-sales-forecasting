@@ -1,0 +1,5 @@
+partition,validation_wrmsse,complexity,paired_mean_loss_vs_best,paired_se_loss_vs_best,one_se_eligible,selected_by_one_se
+global,0.7992808567616068,0,0.0004706954519960137,0.0002197649928530046,False,False
+state,0.7989789645556675,1,0.00016880324605676386,0.00013020257858700776,False,False
+state_category,0.7988101613096107,2,0.0,0.0,True,True
+store_category,0.7988188791734501,3,8.717863839345641e-06,0.0003983908411797743,True,False

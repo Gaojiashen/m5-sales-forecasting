@@ -1,0 +1,233 @@
+{
+  "x_fixed": 8,
+  "rho_candidates": [
+    0.0,
+    0.25,
+    0.5,
+    0.65,
+    0.75,
+    0.8,
+    0.85,
+    0.9,
+    0.95,
+    1.0
+  ],
+  "weight_rule": "w_k proportional to rho^k, k=0 newest; normalize only over post-release available same-weekday values",
+  "rho_zero": "sNaive: latest available same-weekday observation",
+  "rho_one": "equal-weight x=8",
+  "partition_order": [
+    "global",
+    "state",
+    "state_category",
+    "store_category"
+  ],
+  "folds": [
+    {
+      "train_origins": 32,
+      "validation_origins": 8
+    },
+    {
+      "train_origins": 40,
+      "validation_origins": 8
+    },
+    {
+      "train_origins": 48,
+      "validation_origins": 8
+    },
+    {
+      "train_origins": 56,
+      "validation_origins": 8
+    }
+  ],
+  "validation_mean_wrmsse": [
+    {
+      "partition": "global",
+      "validation_wrmsse": 0.7992808567616068,
+      "complexity": 0,
+      "paired_mean_loss_vs_best": 0.0004706954519960137,
+      "paired_se_loss_vs_best": 0.0002197649928530046,
+      "one_se_eligible": false,
+      "selected_by_one_se": false
+    },
+    {
+      "partition": "state",
+      "validation_wrmsse": 0.7989789645556675,
+      "complexity": 1,
+      "paired_mean_loss_vs_best": 0.00016880324605676386,
+      "paired_se_loss_vs_best": 0.00013020257858700776,
+      "one_se_eligible": false,
+      "selected_by_one_se": false
+    },
+    {
+      "partition": "state_category",
+      "validation_wrmsse": 0.7988101613096107,
+      "complexity": 2,
+      "paired_mean_loss_vs_best": 0.0,
+      "paired_se_loss_vs_best": 0.0,
+      "one_se_eligible": true,
+      "selected_by_one_se": true
+    },
+    {
+      "partition": "store_category",
+      "validation_wrmsse": 0.7988188791734501,
+      "complexity": 3,
+      "paired_mean_loss_vs_best": 8.717863839345641e-06,
+      "paired_se_loss_vs_best": 0.0003983908411797743,
+      "one_se_eligible": true,
+      "selected_by_one_se": false
+    }
+  ],
+  "paired_bootstrap": [
+    {
+      "partition": "global",
+      "comparator": "best",
+      "mean_delta": 0.0004706954519960137,
+      "ci95_low": -3.696049493178734e-06,
+      "ci95_high": 0.0008400275285343484,
+      "bootstrap_sd_mean_delta": 0.0002197649928530046,
+      "bootstrap_reps": 2000,
+      "block_length_origins": 4,
+      "note": "Descriptive paired time-block interval; not a claim of statistical significance.",
+      "bootstrap_sd_mean_wrmsse": 0.025552886212099436
+    },
+    {
+      "partition": "state",
+      "comparator": "best",
+      "mean_delta": 0.00016880324605676386,
+      "ci95_low": -0.0002424648350720751,
+      "ci95_high": 0.00026032552423461205,
+      "bootstrap_sd_mean_delta": 0.00013020257858700776,
+      "bootstrap_reps": 2000,
+      "block_length_origins": 4,
+      "note": "Descriptive paired time-block interval; not a claim of statistical significance.",
+      "bootstrap_sd_mean_wrmsse": 0.025446530978975552
+    },
+    {
+      "partition": "state_category",
+      "comparator": "best",
+      "mean_delta": 0.0,
+      "ci95_low": 0.0,
+      "ci95_high": 0.0,
+      "bootstrap_sd_mean_delta": 0.0,
+      "bootstrap_reps": 2000,
+      "block_length_origins": 4,
+      "note": "Descriptive paired time-block interval; not a claim of statistical significance.",
+      "bootstrap_sd_mean_wrmsse": 0.025440696136906877
+    },
+    {
+      "partition": "store_category",
+      "comparator": "best",
+      "mean_delta": 8.717863839345641e-06,
+      "ci95_low": -0.0007510690673319581,
+      "ci95_high": 0.0008003503075199918,
+      "bootstrap_sd_mean_delta": 0.0003983908411797743,
+      "bootstrap_reps": 2000,
+      "block_length_origins": 4,
+      "note": "Descriptive paired time-block interval; not a claim of statistical significance.",
+      "bootstrap_sd_mean_wrmsse": 0.025526368978086706
+    },
+    {
+      "partition": "global",
+      "comparator": "global",
+      "mean_delta": 0.0,
+      "ci95_low": 0.0,
+      "ci95_high": 0.0,
+      "bootstrap_sd_mean_delta": 0.0,
+      "bootstrap_reps": 2000,
+      "block_length_origins": 4,
+      "note": "Descriptive paired time-block interval; not a claim of statistical significance.",
+      "bootstrap_sd_mean_wrmsse": 0.025552886212099436
+    },
+    {
+      "partition": "state",
+      "comparator": "global",
+      "mean_delta": 0.0003018922059392498,
+      "ci95_low": 2.571722791360016e-05,
+      "ci95_high": 0.0007684970796776793,
+      "bootstrap_sd_mean_delta": 0.00019248372972892642,
+      "bootstrap_reps": 2000,
+      "block_length_origins": 4,
+      "note": "Descriptive paired time-block interval; not a claim of statistical significance.",
+      "bootstrap_sd_mean_wrmsse": 0.025446530978975552
+    },
+    {
+      "partition": "state_category",
+      "comparator": "global",
+      "mean_delta": 0.0004706954519960137,
+      "ci95_low": -3.696049493178734e-06,
+      "ci95_high": 0.0008400275285343484,
+      "bootstrap_sd_mean_delta": 0.0002197649928530046,
+      "bootstrap_reps": 2000,
+      "block_length_origins": 4,
+      "note": "Descriptive paired time-block interval; not a claim of statistical significance.",
+      "bootstrap_sd_mean_wrmsse": 0.025440696136906877
+    },
+    {
+      "partition": "store_category",
+      "comparator": "global",
+      "mean_delta": 0.00046197758815666803,
+      "ci95_low": -0.00027466538564099093,
+      "ci95_high": 0.0009973264271792633,
+      "bootstrap_sd_mean_delta": 0.00033726261780069007,
+      "bootstrap_reps": 2000,
+      "block_length_origins": 4,
+      "note": "Descriptive paired time-block interval; not a claim of statistical significance.",
+      "bootstrap_sd_mean_wrmsse": 0.025526368978086706
+    }
+  ],
+  "one_se": 0.0,
+  "selected_partition": "state_category",
+  "best_mean_partition": "state_category",
+  "one_se_rule": "For each candidate, compute its paired validation loss minus the best-mean partition. Choose the simplest candidate whose mean paired loss is no greater than its own within-fold length-4 moving-block bootstrap SD.",
+  "paired_selection_table": [
+    {
+      "partition": "global",
+      "validation_wrmsse": 0.7992808567616068,
+      "paired_mean_loss_vs_best": 0.0004706954519960137,
+      "paired_se_loss_vs_best": 0.0002197649928530046,
+      "one_se_eligible": false,
+      "selected_by_one_se": false
+    },
+    {
+      "partition": "state",
+      "validation_wrmsse": 0.7989789645556675,
+      "paired_mean_loss_vs_best": 0.00016880324605676386,
+      "paired_se_loss_vs_best": 0.00013020257858700776,
+      "one_se_eligible": false,
+      "selected_by_one_se": false
+    },
+    {
+      "partition": "state_category",
+      "validation_wrmsse": 0.7988101613096107,
+      "paired_mean_loss_vs_best": 0.0,
+      "paired_se_loss_vs_best": 0.0,
+      "one_se_eligible": true,
+      "selected_by_one_se": true
+    },
+    {
+      "partition": "store_category",
+      "validation_wrmsse": 0.7988188791734501,
+      "paired_mean_loss_vs_best": 8.717863839345641e-06,
+      "paired_se_loss_vs_best": 0.0003983908411797743,
+      "one_se_eligible": true,
+      "selected_by_one_se": false
+    }
+  ],
+  "selection_note": "Paired bootstrap intervals use two contiguous 4-origin blocks within each 8-origin fold; descriptive uncertainty only, not statistical significance.",
+  "refit_origins": 64,
+  "heldout_actuals": "d_1914..d_1941 are read only after model selection, refit, and forecast save; they do not enter tuning.",
+  "optimizer_note": "Two-pass coordinate descent over the rho grid; this is a local search and does not prove a global optimum.",
+  "forecast_origin": 1913,
+  "forecast_horizon": [
+    1914,
+    1941
+  ],
+  "forecast_note": "Forecast is generated from d_1..d_1913; held-out actuals are read only after fitting and saving the frozen forecast.",
+  "final_holdout_evaluation": {
+    "grouped_rho_wrmsse": 0.7369885241780126,
+    "snaive_reference_wrmsse": 0.869700702331063,
+    "difference_snaive_minus_grouped_rho": 0.13271217815305036,
+    "metric": "01_snaive_wrmsse.py strict official 12-level WRMSSE",
+    "model_frozen_before_actuals": true
+  }
+}

@@ -1,0 +1,10 @@
+partition,group,rho
+state_category,CA × FOODS,0.85
+state_category,CA × HOBBIES,0.9
+state_category,CA × HOUSEHOLD,0.75
+state_category,TX × FOODS,0.9
+state_category,TX × HOBBIES,0.9
+state_category,TX × HOUSEHOLD,0.85
+state_category,WI × FOODS,0.9
+state_category,WI × HOBBIES,1.0
+state_category,WI × HOUSEHOLD,0.85

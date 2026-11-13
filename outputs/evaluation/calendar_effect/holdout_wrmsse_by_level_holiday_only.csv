@@ -1,0 +1,13 @@
+level,node_count,weight_sum,zero_scale_nodes,positive_weight_zero_scale_nodes,wrmsse
+Level 1: Total,1,1.0,0,0,0.5718615625002234
+Level 2: State,3,1.0,0,0,0.6075701579079953
+Level 3: Store,10,1.0,0,0,0.6753129472752282
+Level 4: Category,3,0.9999999999999999,0,0,0.6084986960258129
+Level 5: Department,7,1.0,0,0,0.6845369784129766
+Level 6: State × Category,9,1.0,0,0,0.650273783121053
+Level 7: State × Department,21,1.0000000000000002,0,0,0.7113343346512794
+Level 8: Store × Category,30,1.0,0,0,0.7152598405581347
+Level 9: Store × Department,70,0.9999999999999999,0,0,0.7741163343723857
+Level 10: Item,3049,1.0,0,0,0.8741343437275795
+Level 11: Item × State,9147,1.0,0,0,0.8793120710209962
+Level 12: Item × Store,30490,1.0,0,0,0.8807207383516784

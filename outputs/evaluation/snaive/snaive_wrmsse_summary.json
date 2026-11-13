@@ -1,0 +1,22 @@
+{
+  "method": "Seasonal Naive (repeat d_1907..d_1913 four times)",
+  "train_days": [
+    1,
+    1913
+  ],
+  "test_days": [
+    1914,
+    1941
+  ],
+  "weight_days": [
+    1886,
+    1913
+  ],
+  "series_count": 30490,
+  "hierarchy_node_count": 42840,
+  "level_count": 12,
+  "equal_level_weight": 0.08333333333333333,
+  "wrmsse": 0.869700702331063,
+  "zero_scale_nodes_across_levels": 0,
+  "positive_weight_zero_scale_nodes_across_levels": 0
+}

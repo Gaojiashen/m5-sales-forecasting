@@ -1,0 +1,11 @@
+split,method,origins,FOODS_x,HOBBIES_x,HOUSEHOLD_x,mean_wrmsse
+development,development_selected_joint_vector,32,4,8,8,0.8433584443152768
+development,development_selected_shared_x,32,8,8,8,0.8460982432814584
+development,seasonal_naive_x1,32,1,1,1,1.013105933117843
+confirmation,development_selected_joint_vector,16,4,8,8,0.8075826571414066
+confirmation,development_selected_shared_x,16,8,8,8,0.801864455961338
+confirmation,seasonal_naive_x1,16,1,1,1,0.9566091349334336
+audit,adopted_choice,16,8,8,8,0.8052980583407996
+audit,development_selected_joint_vector,16,4,8,8,0.7989855976220082
+audit,development_selected_shared_x,16,8,8,8,0.8052980583407996
+audit,seasonal_naive_x1,16,1,1,1,0.9762757291916413

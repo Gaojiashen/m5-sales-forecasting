@@ -1,0 +1,7 @@
+{
+  "grouped_rho_wrmsse": 0.7369885241780126,
+  "snaive_reference_wrmsse": 0.869700702331063,
+  "difference_snaive_minus_grouped_rho": 0.13271217815305036,
+  "metric": "01_snaive_wrmsse.py strict official 12-level WRMSSE",
+  "model_frozen_before_actuals": true
+}
