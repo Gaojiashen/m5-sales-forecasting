@@ -1,4 +1,4 @@
-"""在分组 rho 模型上比较节日、SNAP 及两者共同作用的日历乘数。基于滚动起点的分组总销量拟合参数，按验证期 WRMSSE 选择候选，输出预测、系数和图形。"""
+'Compare holiday, SNAP, and combined calendar multipliers on the grouped-rho model. Fit group-total parameters on rolling origins, select by validation WRMSSE, and export forecasts, coefficients, and figures.'
 from __future__ import annotations
 
 import argparse
@@ -25,7 +25,7 @@ EVENTS = ("Pesach End", "OrthodoxEaster", "Cinco De Mayo", "Mother's day")
 GROUP_FIELDS = ("state_id", "cat_id")
 HORIZON = 28
 X = 8
-# 对数乘数的岭惩罚。每个节日在目标窗口仅出现四次，因此节日系数采用比 SNAP 更强的惩罚。
+# Ridge penalties on log multipliers; sparse holiday occurrences receive stronger regularization than SNAP.
 LAMBDA_BETA = 2.0
 GAMMA_RIDGE_MULTIPLIER = 1.0
 
@@ -55,7 +55,7 @@ def prep_groups(meta: pd.DataFrame):
 
 
 def origin_data(train, origin, release, calendar, group_rows, rho):
-    """整理同星期历史、未来 28 天的分组真实销量和日历特征。"""
+    'Prepare same-weekday history, 28-day group actuals, and calendar features.'
     histories = []
     for rows in group_rows:
         group_hist = []
@@ -67,7 +67,7 @@ def origin_data(train, origin, release, calendar, group_rows, rho):
             values = np.asarray(train[np.ix_(rows, days - 1)], dtype=np.float64)
             group_release = release if len(release) == len(rows) else release[rows]
             available = days[None, :] >= group_release[:, None]
-            # 日历特征与由近及远的同星期历史销量对齐。
+            # Align calendar features with same-weekday values from newest to oldest.
             snap = np.zeros(len(days), dtype=np.float64)
             holiday = np.zeros(len(days), dtype=bool)
             if len(days):
@@ -90,7 +90,7 @@ def origin_data(train, origin, release, calendar, group_rows, rho):
 
 
 def profiles_and_derivative(data, beta, skip_holidays: bool):
-    """计算分组星期曲线及其对各组 SNAP 系数 beta 的导数。"""
+    'Compute group weekday profiles and derivatives with respect to each SNAP coefficient beta.'
     if "profile_sums" in data:
         sums = data["profile_sums"][:, int(skip_holidays)]
         snaps = data["snap_history"]
@@ -116,7 +116,7 @@ def profiles_and_derivative(data, beta, skip_holidays: bool):
 
 
 def rolling_score(meta, train, forecast, origin, aggs, scales, weights):
-    """使用当前起点的权重和缩放分母计算完整 12 层级 WRMSSE。"""
+    'Compute full 12-level WRMSSE using origin-specific weights and scales.'
     actual = np.asarray(train[:, origin:origin + HORIZON], dtype=np.float64)
     total = 0.0
     for agg, scale, weight in zip(aggs, scales, weights):
@@ -167,15 +167,15 @@ def main():
     cal = pd.read_csv(RAW / "calendar.csv")
     cal["d_num"] = cal.d.str.removeprefix("d_").astype(int)
     cal["snap"] = cal[["snap_CA", "snap_TX", "snap_WI"]].to_numpy().max(axis=1)
-    # 每组的 SNAP 特征按所属州构建。
+    # Construct group SNAP features from each group's state.
     cal["events"] = list(event_matrix(cal))
     cal["holiday"] = cal.event_name_1.notna() & cal.event_name_1.ne("") | cal.event_name_2.notna() & cal.event_name_2.ne("")
-    # 保留各州 SNAP 标记，分组时提取对应州的特征。
+    # Retain state SNAP flags and select the appropriate feature per group.
     codes, labels, group_rows = prep_groups(meta)
     state_by_group = [meta.iloc[rows[0]].state_id for rows in group_rows]
     state_snap_col = {"CA": "snap_CA", "TX": "snap_TX", "WI": "snap_WI"}
     fold_specs = ((2, 1),) if args.smoke else FOLDS
-    # 为各组建立对应州的日历上下文。
+    # Build group-specific calendar contexts.
     rho_fold = pd.read_csv(RHO_DIR / "learned_rho_by_fold.csv")
     rho_final = pd.read_csv(RHO_DIR / "learned_rho_final.csv")
     actual_snap_cols = [state_snap_col[s] for s in state_by_group]
@@ -286,7 +286,7 @@ def main():
         return {"origin":origin,"profile_sums":profile_sums,"snap_history":snap_history,
                 "events":event_array,"snap":np.stack(snaps),"actual":np.stack(actual),"fit_mask":fit_mask}
 
-    # 将共用 SNAP 特征替换为分州特征，然后运行各折。
+    # Replace shared SNAP flags with state-specific flags, then run the folds.
     score_rows=[]; coef_rows=[]; fitted_by_fold={}
     fold_event_counts=[]; ridge_rows=[]
     for fold_no,(ntrain,nvalid) in enumerate(fold_specs,1):
@@ -321,7 +321,7 @@ def main():
                                        "gamma_ridge_multiplier":np.nan})
             for o,d in valid_contexts.items():
                 prediction=leaf_local(o,rhos,params,model,d["events"][0],d["snap"])
-                # 按当前起点计算滚动评分的权重和缩放分母。
+                # Compute rolling weights and scales at the current origin.
                 score=rolling_score(meta,train,prediction,o,aggs,*rolling_metrics[o])
                 score_rows.append({"fold":fold_no,"origin_d":o,"model":model,"wrmsse":score,"n_train_origins":ntrain})
             print(f"fold {fold_no} {model}: fitted on {ntrain} origins",flush=True)
@@ -338,7 +338,7 @@ def main():
     overall.to_csv(OUT/"validation_model_summary.csv",index=False)
 
     if args.smoke:
-        # 用一个小时间切分进行端到端检查，比较零参数修正与原 rho 曲线。
+        # Check one small temporal split and compare zero-parameter corrections with the rho profile.
         rho_part=rho_fold[(rho_fold.fold==1)&(rho_fold.partition=="state_category")]
         smoke_rhos=np.array([float(rho_part.set_index("group").loc[label,"rho"]) for label in labels])
         smoke_origin=ORIGINS[2]
@@ -355,7 +355,7 @@ def main():
             raise AssertionError("smoke: zero coefficients do not match holiday-filtered baseline")
         if not np.isfinite(zero_both).all() or (zero_both < 0).any():
             raise AssertionError("smoke: invalid forecast values")
-        # 在一个 SNAP 坐标和一个事件坐标上核对解析梯度；向副本加入目标事件以计算事件方向的梯度。
+        # Check analytic gradients in one SNAP and one event coordinate; inject a target event into a copy.
         probe={**fit_contexts[0],"events":fit_contexts[0]["events"].copy()}
         probe["events"][:,0,0]=1.0
         probe["fit_mask"]=np.ones(28,dtype=bool)
@@ -401,7 +401,7 @@ def main():
         print(f"real-data smoke passed: one validation origin, all four candidates; max rho-baseline difference={baseline_error:.3g}, max nonzero-parameter preaggregation difference={preagg_error:.3g}",flush=True)
         return
 
-    # 最终拟合使用截至 d_1913 的数据和 04 保存的州×品类 rho。
+    # Fit through d_1913 using the saved final state-category rho table.
     rhos=np.array([float(rho_final.set_index("group").loc[label,"rho"]) for label in labels])
     final_origins=ORIGINS
     final_contexts=[make_context_local(o,rhos) for o in final_origins]
@@ -447,7 +447,7 @@ def main():
                                             group_rows,model in ("holiday_only","both")))
     pd.DataFrame(final_coef).to_csv(OUT/"final_calendar_coefficients.csv",index=False)
 
-    # 检查零系数退化、预测非负性、行列顺序及事件叠加。
+    # Check zero-coefficient behavior, nonnegativity, ordering, and overlapping events.
     base=leaf_local(1913,rhos,np.zeros(0),"baseline",target_events,target_snap)
     zero_snap=leaf_local(1913,rhos,np.zeros(9),"snap_only",target_events,target_snap)
     zero_holiday=leaf_local(1913,rhos,np.zeros(4),"holiday_only",target_events,target_snap)
@@ -467,7 +467,7 @@ def main():
     overlap=np.flatnonzero((target_events.sum(axis=1)>1))
     overlap_check={"days":future_days[overlap].tolist(),"event_counts":target_events[overlap].sum(axis=1).astype(int).tolist()}
 
-    # 计算各候选的留出期 WRMSSE。
+    # Compute holdout WRMSSE for all candidates.
     actual=metric.load_test_actuals(meta)
     cal_train=cal.loc[cal.d_num.between(1,1913)].copy(); cal_test=cal.loc[cal.d_num.between(1914,1941)].copy()
     weights_weeks=set(cal_train.loc[cal_train.d_num.between(1886,1913),"wm_yr_wk"].astype(int))
@@ -479,7 +479,7 @@ def main():
         holdout.append({"model":model,"holdout_wrmsse_descriptive":score})
     pd.DataFrame(holdout).to_csv(OUT/"holdout_wrmsse_descriptive.csv",index=False)
 
-    # 统计全部滚动目标窗口及开发期窗口中的事件次数。
+    # Count event occurrences across rolling and development targets.
     target_event_counts={}
     for event_i,name in enumerate(EVENTS):
         all_count=dev_count=0
@@ -518,7 +518,7 @@ def main():
                            "28_day_order_preserved":True,"overlap_composition_probe_passed":True,"future_data_leakage":False}}
     (OUT/"experiment_summary.json").write_text(json.dumps(summary,indent=2,ensure_ascii=False),encoding="utf-8")
 
-    # 绘制结果说明图。
+    # Draw explanatory result figures.
     fig,ax=plt.subplots(figsize=(8,4.5)); ordered=overall.sort_values("mean_validation_wrmsse")
     ax.bar(ordered.model,ordered.mean_validation_wrmsse,color=["#457b9d" if m=="baseline" else "#2a9d8f" for m in ordered.model]); ax.set_ylabel("Mean validation 12-level WRMSSE (lower is better)"); ax.set_title("Calendar correction on rolling validation folds"); ax.grid(axis="y",alpha=.25); fig.tight_layout(); fig.savefig(FIGURES/"01_model_validation_scores.png",dpi=180); plt.close(fig)
     co=pd.DataFrame(final_coef); co=co[co.parameter.str.startswith("gamma:")]

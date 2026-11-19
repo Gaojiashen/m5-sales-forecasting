@@ -1,4 +1,4 @@
-"""在 d_1914 至 d_1941 上评估 M5 季节性朴素预测，计算 12 层级 WRMSSE。"""
+'Evaluate M5 seasonal-naive forecasts on d_1914 through d_1941 using 12-level WRMSSE.'
 from __future__ import annotations
 
 import json
@@ -41,7 +41,7 @@ def require_file(path: Path) -> Path:
 
 
 def load_data():
-    """以内存映射读取历史销量，并核对元数据顺序。"""
+    'Load memory-mapped sales history and verify metadata order.'
     meta = pd.read_csv(require_file(PROCESSED / "sales_metadata.csv"))
     raw_columns = ["id", "item_id", "dept_id", "cat_id", "store_id", "state_id"]
     raw_meta = pd.read_csv(require_file(RAW / "sales_train_validation.csv"), usecols=raw_columns)
@@ -69,7 +69,7 @@ def load_data():
 
 
 def load_weight_window_prices(relevant_weeks: set[int]) -> pd.DataFrame:
-    """读取训练期最后 28 天对应的每周价格。"""
+    'Read weekly prices for the last 28 training days.'
     pieces = []
     for chunk in pd.read_csv(require_file(RAW / "sell_prices.csv"),
                              usecols=["store_id", "item_id", "wm_yr_wk", "sell_price"],
@@ -83,7 +83,7 @@ def load_weight_window_prices(relevant_weeks: set[int]) -> pd.DataFrame:
 
 
 def load_test_actuals(meta: pd.DataFrame) -> np.ndarray:
-    """读取留出期真实销量，并按商品和门店对齐。"""
+    'Read held-out sales and align them by item and store.'
     actual_cols = [f"d_{d}" for d in range(TRAIN_END + 1, TRAIN_END + HORIZON + 1)]
     usecols = ["id", "item_id", "store_id", *actual_cols]
     actual_df = pd.read_csv(require_file(RAW / "sales_train_evaluation.csv"), usecols=usecols)
@@ -106,18 +106,18 @@ def load_test_actuals(meta: pd.DataFrame) -> np.ndarray:
 
 
 def make_snaive(train: np.ndarray) -> np.ndarray:
-    """将每条底层序列最后七天的销量重复四次。"""
+    'Repeat the last seven observed values four times per leaf series.'
     if train.shape[1] != TRAIN_END:
         raise ValueError("Forecast input must stop at d_1913")
     return np.tile(train[:, -7:], (1, 4)).astype(np.float64, copy=False)
 
 
 def build_hierarchy_matrices(meta: pd.DataFrame) -> list[sparse.csr_matrix]:
-    """为 12 个层级建立节点到商品门店序列的 CSR 稀疏聚合矩阵。"""
+    'Build node-by-leaf CSR aggregation matrices for all 12 levels.'
     matrices = []
     n_leaf = len(meta)
     for level, (_, keys) in enumerate(LEVELS):
-        if level == 11:  # 第 12 层级对应 30,490 条商品门店序列。
+        if level == 11:  # Level 12 contains the 30,490 leaf item-store series.
             matrices.append(sparse.identity(n_leaf, format="csr", dtype=np.float64))
             continue
         if not keys:
@@ -137,7 +137,7 @@ def build_hierarchy_matrices(meta: pd.DataFrame) -> list[sparse.csr_matrix]:
 
 def calculate_scale(aggregator: sparse.csr_matrix, train: np.ndarray,
                     chunk_size: int = 512) -> np.ndarray:
-    """分块计算各序列的 RMSSE 缩放分母。"""
+    'Compute RMSSE scales in chunks.'
     n_nodes = aggregator.shape[0]
     scale = np.zeros(n_nodes, dtype=np.float64)
     for start in range(0, n_nodes, chunk_size):
@@ -146,7 +146,7 @@ def calculate_scale(aggregator: sparse.csr_matrix, train: np.ndarray,
         nonzero = block != 0
         has_nonzero = nonzero.any(axis=1)
         first = np.argmax(nonzero, axis=1)
-        # 对平方一阶差分计算前缀和，按各行首次非零位置确定缩放分母；临时差分矩阵按块构建。
+        # Use prefix sums of squared first differences and each row's first nonzero position; process differences in chunks.
         diffs = np.diff(block, axis=1)
         prefix = np.concatenate(
             [np.zeros((len(block), 1), dtype=np.float64), np.cumsum(diffs * diffs, axis=1)],
@@ -161,7 +161,7 @@ def calculate_scale(aggregator: sparse.csr_matrix, train: np.ndarray,
 
 
 def score_wrmsse(meta, train, actual, forecast, cal_train, cal_test, prices):
-    """计算各层级的加权 RMSSE，并对 12 层得分取等权平均。"""
+    'Compute revenue-weighted RMSSE within each level and average the 12 scores.'
     recent_sales = train[:, WEIGHT_START - 1:TRAIN_END]
     if prices.duplicated(["item_id", "store_id", "wm_yr_wk"]).any():
         raise ValueError("Duplicate item-store-week prices would make WRMSSE weights ambiguous")
@@ -249,10 +249,10 @@ def draw_outputs(meta, train, actual, forecast, cal_train, cal_test, scores):
             chosen = selected.loc[selected["cat_id"] == cat].iloc[0]
             row = int(chosen["row_index"])
             if meta.iloc[row]["id"] != chosen["id"]:
-                raise ValueError("示例商品选择表与当前销量元数据不一致")
+                raise ValueError('Example-series selections do not match the sales metadata')
             rows.append(row)
     else:
-        # 示例表缺失时，在每个品类中选择近一年日均销量最接近中位数的序列。
+        # If selections are absent, choose the series closest to each category's recent-year median daily sales.
         recent_mean = train[:, -365:].mean(axis=1)
         rows = []
         for cat in ("FOODS", "HOUSEHOLD", "HOBBIES"):
@@ -305,7 +305,7 @@ def main():
     actual = load_test_actuals(meta)
     score, levels = score_wrmsse(meta, train, actual, forecast, cal_train, cal_test, prices)
     pred = pd.DataFrame(forecast, columns=[f"d_{d}" for d in range(TRAIN_END + 1, TRAIN_END + HORIZON + 1)])
-    # 预测窗口对应 validation 阶段，预测文件使用 _validation 后缀的 ID。
+    # This horizon belongs to validation; retain _validation IDs.
     pred.insert(0, "id", meta["id"])
     pred.to_csv(OUT / "snaive_predictions.csv", index=False)
     levels.to_csv(OUT / "snaive_wrmsse_by_level.csv", index=False)

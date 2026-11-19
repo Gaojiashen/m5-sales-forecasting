@@ -1,4 +1,4 @@
-"""根据选定的 BLX 模型生成 M5 Accuracy 提交 CSV。validation 部分使用 d_1914 至 d_1941 的既有预测；evaluation 部分沿用所选 rho、日历系数、kappa 和混合权重，将起点推进到 d_1941，预测 d_1942 至 d_1969。结果保存至 outputs/submission/。"""
+'Build the M5 Accuracy submission from the selected BLX model. Reuse frozen d_1914 through d_1941 validation forecasts; advance to d_1941 with the selected rho, calendar coefficients, kappa, and mixture weights to predict d_1942 through d_1969. Output: outputs/submission/.'
 from __future__ import annotations
 
 import json
@@ -21,7 +21,7 @@ LEAF_COUNT = 30490
 
 
 def load_experiment_module():
-    """加载选定实验的预测函数。"""
+    'Load prediction functions from the selected experiment.'
     path = Path(__file__).with_name("08_borrow_information_wrmsse.py")
     spec = spec_from_file_location("m5_borrow_information", path)
     if spec is None or spec.loader is None:
@@ -32,7 +32,7 @@ def load_experiment_module():
 
 
 def load_history(meta: pd.DataFrame) -> np.ndarray:
-    """向已有训练矩阵追加 d_1914 至 d_1941 的 28 天销量，并用重叠的 d_1913 核对数据。"""
+    'Append d_1914 through d_1941 to history and check the overlapping d_1913 values.'
     old = np.load(PROCESSED / "sales_matrix.npy", mmap_mode="r")
     if old.shape != (LEAF_COUNT, 1913):
         raise ValueError(f"Unexpected processed training shape: {old.shape}")
@@ -58,7 +58,7 @@ def load_history(meta: pd.DataFrame) -> np.ndarray:
 
 
 def evaluation_forecast(model, meta: pd.DataFrame, history: np.ndarray) -> np.ndarray:
-    """在 d_1941 起点应用已选参数，生成下一段 28 天预测。"""
+    'Apply the selected parameters at d_1941 to forecast the next 28 days.'
     summary = json.loads(
         (EXPERIMENT / "borrow_information" / "experiment_summary.json").read_text(encoding="utf-8")
     )
@@ -128,7 +128,7 @@ def main() -> None:
     print("Forecasting d_1942..d_1969 with the selected model...", flush=True)
     evaluation = evaluation_forecast(model, meta, history)
 
-    # 按提交模板的顺序和布局组织结果，validation 预测按 ID 对齐。
+    # Use template layout and ID order; align the frozen validation forecasts by ID.
     template = pd.read_csv(RAW / "sample_submission.csv", usecols=["id"])
     expected_columns = ["id", *[f"F{i}" for i in range(1, HORIZON + 1)]]
     template_header = pd.read_csv(RAW / "sample_submission.csv", nrows=0).columns.tolist()
@@ -162,7 +162,7 @@ def main() -> None:
         raise ValueError("Final submission layout is invalid")
     destination = OUT / "m5_accuracy_submission.csv"
     result.to_csv(destination, index=False, float_format="%.8f")
-    # 重新读取生成的 CSV，检查保存后的格式和数值。
+    # Read back the CSV and check serialized layout and values.
     saved = pd.read_csv(destination)
     numbers = saved.iloc[:, 1:].to_numpy(float)
     if (saved.columns.tolist() != expected_columns or len(saved) != 2 * LEAF_COUNT

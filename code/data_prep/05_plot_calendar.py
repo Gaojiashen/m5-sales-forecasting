@@ -1,15 +1,4 @@
-"""
-读取 M5 日历，展示训练期和预测期的事件与 SNAP 标记。
-
-以下路径均相对于项目根目录。
-输入：data/m5-forecasting-accuracy/calendar.csv。
-绘图样式由同目录的 plot_style.py 提供。
-
-输出至 outputs/data_prep/calendar/figures/，每张图保存 PNG 和 SVG 两种格式：
-- 01_training_calendar_overview：训练期每月事件分布及各州 SNAP 标记比例。
-- 02_training_28_day_example：上一年相近季节的 28 天日历示例。
-- 03_forecast_28_days：预测期 d_1914～d_1941 的事件与 SNAP 标记。
-"""
+'Visualize M5 event and SNAP flags in training and forecast calendars.\nPaths are relative to the project root.\nInput: data/m5-forecasting-accuracy/calendar.csv; shared styling: plot_style.py.\nOutputs in outputs/data_prep/calendar/figures/: PNG/SVG pairs for the training-calendar overview, a 28-day example from the previous spring, and the d_1914 through d_1941 forecast calendar.'
 from __future__ import annotations
 
 from pathlib import Path
@@ -38,14 +27,14 @@ EXAMPLE_LAST = pd.Timestamp("2015-05-22")
 EVENT_NAMES = ("event_name_1", "event_name_2")
 EVENT_TYPES = ("event_type_1", "event_type_2")
 SNAP_COLUMNS = ("snap_CA", "snap_TX", "snap_WI")
-MONTH_LABELS = ("1月", "2月", "3月", "4月", "5月", "6月",
-                "7月", "8月", "9月", "10月", "11月", "12月")
+MONTH_LABELS = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
 
 
 def read_calendar() -> pd.DataFrame:
-    """读取日历，检查绘图所需的日期、事件和 SNAP 标记列。"""
+    'Read the calendar and validate date, event, and SNAP fields.'
     if not CALENDAR_FILE.exists():
-        raise FileNotFoundError(f"找不到 M5 日历文件：{CALENDAR_FILE}")
+        raise FileNotFoundError(f"M5 calendar file not found: {CALENDAR_FILE}")
     calendar = pd.read_csv(CALENDAR_FILE, parse_dates=["date"])
     calendar["d_num"] = calendar["d"].str.removeprefix("d_").astype(int)
     calendar = calendar.sort_values("d_num").reset_index(drop=True)
@@ -54,24 +43,24 @@ def read_calendar() -> pd.DataFrame:
     for column in SNAP_COLUMNS:
         calendar[column] = pd.to_numeric(calendar[column], errors="raise")
         if not calendar[column].isin((0, 1)).all():
-            raise ValueError(f"{column} 只能包含 0 或 1")
+            raise ValueError(f"{column} must contain only 0 or 1")
     return calendar
 
 
 def validate_28_days(frame: pd.DataFrame, label: str) -> pd.DataFrame:
-    """检查是否恰好包含连续的 28 天，避免绘制缺日或日期错序的区间。"""
+    'Check that a period contains exactly 28 consecutive dates and day identifiers.'
     frame = frame.sort_values("date").reset_index(drop=True)
     if len(frame) != 28:
-        raise ValueError(f"{label}：预期有 28 个日历日，实际有 {len(frame)} 个")
+        raise ValueError(f"{label}: expected 28 calendar dates; found {len(frame)} dates")
     if not np.all(np.diff(frame.d_num.to_numpy()) == 1):
-        raise ValueError(f"{label}：M5 天数编号不连续")
+        raise ValueError(f"{label}: M5 day identifiers are not consecutive")
     if not (frame.date.diff().dropna() == pd.Timedelta(days=1)).all():
-        raise ValueError(f"{label}：日历日期不连续")
+        raise ValueError(f"{label}: Calendar dates are not consecutive")
     return frame
 
 
 def event_records(frame: pd.DataFrame) -> list[tuple[int, str, str]]:
-    """读取两组事件字段；同一天记录两个事件时均予以保留。"""
+    'Read both event fields, retaining overlapping events.'
     records = []
     for day_index, row in frame.iterrows():
         for name_col, type_col in zip(EVENT_NAMES, EVENT_TYPES):
@@ -82,7 +71,7 @@ def event_records(frame: pd.DataFrame) -> list[tuple[int, str, str]]:
 
 
 def plot_training_overview(train: pd.DataFrame) -> None:
-    """展示整个训练期内事件类型、事件日比例和 SNAP 标记的月度分布。"""
+    'Show monthly event frequencies, event types, and SNAP-flag shares.'
     has_event = train[list(EVENT_NAMES)].ne("").any(axis=1)
     month = train.date.dt.month
     monthly_event_rate = has_event.groupby(month).mean().reindex(range(1, 13))
@@ -103,16 +92,16 @@ def plot_training_overview(train: pd.DataFrame) -> None:
     ax_month.bar(x, monthly_event_rate.to_numpy(), color=BLUE, width=0.66)
     ax_month.set_xticks(x, MONTH_LABELS)
     ax_month.yaxis.set_major_formatter(PercentFormatter(1.0, decimals=0))
-    ax_month.set_ylabel("至少有一个事件的日期比例")
-    ax_month.set_title("各月事件日比例", loc="left", pad=12,
+    ax_month.set_ylabel('Share of dates with at least one event')
+    ax_month.set_title('Monthly event-day share', loc="left", pad=12,
                        fontsize=12, weight="bold")
     ax_month.set_ylim(0, max(0.16, float(monthly_event_rate.max()) * 1.18))
     style_axis(ax_month)
 
     ax_types.barh(type_counts.index, type_counts.to_numpy(), color=ORANGE, height=0.62)
-    ax_types.set_title("已记录的事件类型", loc="left", pad=12,
+    ax_types.set_title('Recorded event types', loc="left", pad=12,
                        fontsize=12, weight="bold")
-    ax_types.set_xlabel("事件记录数")
+    ax_types.set_xlabel('Event records')
     ax_types.set_xlim(0, max(1.0, float(type_counts.max()) * 1.18))
     for y, count in enumerate(type_counts.to_numpy()):
         ax_types.text(count + max(1, type_counts.max() * 0.02), y, str(count),
@@ -121,12 +110,12 @@ def plot_training_overview(train: pd.DataFrame) -> None:
     ax_types.grid(axis="x", color=GRID, linewidth=0.7)
     ax_types.set_axisbelow(True)
 
-    # 热力图统计的是日历日期比例，不是销量占比。
+    # The heatmap shows shares of calendar dates, not shares of sales.
     matrix = snap_by_month.to_numpy(dtype=float).T
     heat = ax_snap.imshow(matrix, aspect="auto", cmap="YlGnBu", vmin=0, vmax=0.5)
     ax_snap.set_xticks(x, MONTH_LABELS)
-    ax_snap.set_yticks(range(3), ("加利福尼亚州", "得克萨斯州", "威斯康星州"))
-    ax_snap.set_title("各州各月 SNAP 标记日期比例",
+    ax_snap.set_yticks(range(3), ('California', 'Texas', 'Wisconsin'))
+    ax_snap.set_title('Monthly SNAP-flag share by state',
                       loc="left", pad=12, fontsize=12, weight="bold")
     for row in range(3):
         for col in range(12):
@@ -141,21 +130,21 @@ def plot_training_overview(train: pd.DataFrame) -> None:
         spine.set_visible(False)
     colorbar = fig.colorbar(heat, ax=ax_snap, pad=0.015, fraction=0.022)
     colorbar.ax.yaxis.set_major_formatter(PercentFormatter(1.0, decimals=0))
-    colorbar.set_label("标记日期比例", color=MUTED)
+    colorbar.set_label('Share of flagged dates', color=MUTED)
 
     start = train.date.min().date().isoformat()
     end = train.date.max().date().isoformat()
     add_context(
         fig,
-        "训练期日历｜预测前已知的日期标记",
-        f"d_1–d_{TRAIN_END} · {start} 至 {end} · 展示标记频率，不代表销量影响",
-        "来源：M5 calendar.csv。各月比例以该月已有日期为分母；事件类型按记录条数计数。",
+        'Training calendar | known date markers',
+        f"d_1–d_{TRAIN_END} · {start} to {end} | marker frequencies",
+        'Source: M5 calendar.csv. Monthly shares use observed dates; event types count individual records.',
     )
     export(fig, OUT / "01_training_calendar_overview")
 
 
 def choose_annotation_lanes(records: list[tuple[int, str, str]]) -> list[int]:
-    """将相邻事件的标签分配到不同高度，减少文字重叠。"""
+    'Place nearby event labels on separate annotation levels.'
     last_at_lane = [-100] * 4
     lanes = []
     for day_index, _, _ in records:
@@ -169,7 +158,7 @@ def choose_annotation_lanes(records: list[tuple[int, str, str]]) -> list[int]:
 
 def plot_28_day_strip(frame: pd.DataFrame, *, title: str,
                       subtitle: str, filename: str) -> None:
-    """采用相同的坐标布局绘制训练期示例和预测期的 28 天日历。"""
+    'Use the same layout for the training example and forecast calendar.'
     records = event_records(frame)
     lanes = choose_annotation_lanes(records)
     fig = plt.figure(figsize=(16.5, 6.8))
@@ -185,10 +174,10 @@ def plot_28_day_strip(frame: pd.DataFrame, *, title: str,
     ax_events.tick_params(axis="x", bottom=False, labelbottom=False)
     for spine in ax_events.spines.values():
         spine.set_visible(False)
-    ax_events.text(-0.7, 2.20, "已记录事件", color=MUTED,
+    ax_events.text(-0.7, 2.20, 'Recorded events', color=MUTED,
                    fontsize=9, weight="bold")
     if not records:
-        ax_events.text(13.5, 1.25, "这 28 天内没有已命名事件",
+        ax_events.text(13.5, 1.25, 'No named events in this 28-day period',
                        ha="center", va="center", color=MUTED)
     for (day_index, name, event_type), lane in zip(records, lanes):
         label = name if not event_type else f"{name}\n{event_type}"
@@ -209,11 +198,11 @@ def plot_28_day_strip(frame: pd.DataFrame, *, title: str,
     cmap = ListedColormap(["#E9F0F5", TEAL])
     norm = BoundaryNorm([-0.5, 0.5, 1.5], cmap.N)
     ax_snap.imshow(data, aspect="auto", cmap=cmap, norm=norm)
-    ax_snap.set_yticks(range(3), ("加利福尼亚州", "得克萨斯州", "威斯康星州"))
-    ax_snap.set_ylabel("SNAP 标记", labelpad=16)
+    ax_snap.set_yticks(range(3), ('California', 'Texas', 'Wisconsin'))
+    ax_snap.set_ylabel('SNAP flags', labelpad=16)
     ax_snap.set_xticks(np.arange(28))
     ax_snap.set_xticklabels(
-        [f"{d.month}/{d.day}\n周{'一二三四五六日'[d.weekday()]}" for d in frame.date],
+        [f"{d.month}/{d.day}\n{('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')[d.weekday()]}" for d in frame.date],
         fontsize=7.2, rotation=45, ha="right", rotation_mode="anchor",
     )
     ax_snap.set_xticks(np.arange(-0.5, 28, 1), minor=True)
@@ -225,50 +214,50 @@ def plot_28_day_strip(frame: pd.DataFrame, *, title: str,
     for boundary in (6.5, 13.5, 20.5):
         ax_events.axvline(boundary, color=GRID, linewidth=1, linestyle="--", zorder=0)
         ax_snap.axvline(boundary, color="#9AAFC2", linewidth=1.5)
-    fig.legend(handles=[Patch(facecolor=TEAL, label="SNAP = 1（有标记）"),
-                        Patch(facecolor="#E9F0F5", label="SNAP = 0（无标记）")],
-               loc="lower right", bbox_to_anchor=(0.97, 0.10),
+    fig.legend(handles=[Patch(facecolor=TEAL, label='SNAP = 1 (flagged)'),
+                        Patch(facecolor="#E9F0F5", label='SNAP = 0 (unflagged)')],
+               loc="lower right", bbox_to_anchor=(0.97, 0.06),
                ncol=2, frameon=False, fontsize=9)
     add_context(
         fig, title, subtitle,
-        "来源：M5 calendar.csv。事件与 SNAP 标记是预先已知的日历信息；颜色不表示销量或估计影响。",
+        'Source: M5 calendar.csv. Event and SNAP flags describe known calendar information, not estimated sales effects.',
     )
     export(fig, OUT / filename)
 
 
 def main() -> None:
-    """读取并校验日历，依次生成训练期概览和两张 28 天日历图。"""
+    'Validate the calendar and generate the overview and two 28-day strips.'
     apply_style()
-    # 在本脚本中优先使用中文字体，避免中文标题和标签显示为方框。
-    plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "DejaVu Sans"]
+    # Use standard Latin fonts for English titles and labels.
+    plt.rcParams["font.sans-serif"] = ["Segoe UI", "Arial", "DejaVu Sans"]
     calendar = read_calendar()
     train = calendar.loc[calendar.d_num <= TRAIN_END].copy()
     if len(train) != TRAIN_END or not np.array_equal(
         train.d_num.to_numpy(), np.arange(1, TRAIN_END + 1)
     ):
-        raise ValueError("训练期日历必须完整包含 d_1 至 d_1913")
+        raise ValueError('Training calendar must contain d_1 through d_1913')
     example = validate_28_days(
         train.loc[train.date.between(EXAMPLE_FIRST, EXAMPLE_LAST)].copy(),
-        "训练期示例",
+        'Training example',
     )
     future = validate_28_days(
         calendar.loc[calendar.d_num.between(FORECAST_FIRST, FORECAST_LAST)].copy(),
-        "预测区间",
+        'Forecast horizon',
     )
     plot_training_overview(train)
     plot_28_day_strip(
         example,
-        title="训练期示例｜上一年春季的 28 天",
-        subtitle=f"{EXAMPLE_FIRST.date()} 至 {EXAMPLE_LAST.date()} · 与预测期季节相近，均为 d_1913 之前的已知日期",
+        title='Training example | 28 days in the previous spring',
+        subtitle=f"{EXAMPLE_FIRST.date()} to {EXAMPLE_LAST.date()} | similar season, observed before d_1913",
         filename="02_training_28_day_example",
     )
     plot_28_day_strip(
         future,
-        title="预测期日历｜需要预测的 28 天",
-        subtitle=f"d_{FORECAST_FIRST}–d_{FORECAST_LAST} · {future.date.min().date()} 至 {future.date.max().date()} · 预测前已知的日历信息",
+        title='Forecast calendar | the 28 days to predict',
+        subtitle=f"d_{FORECAST_FIRST}–d_{FORECAST_LAST} · {future.date.min().date()} to {future.date.max().date()} | calendar known at the forecast origin",
         filename="03_forecast_28_days",
     )
-    print(f"已生成三组日历图（PNG 和 SVG）：{OUT}")
+    print(f"Generated three calendar figure pairs (PNG and SVG): {OUT}")
 
 
 if __name__ == "__main__":

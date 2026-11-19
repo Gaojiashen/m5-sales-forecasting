@@ -1,4 +1,4 @@
-"""绘制窗口 x 的选择过程：统一窗口曲线、729 种品类组合、确认期与审计期比较及商品示例。补算并缓存 x=5 的确认期得分。结果保存至 outputs/evaluation/x_selection/。"""
+'Visualize shared windows, all 729 category vectors, confirmation and audit comparisons, and an item example. Compute and cache x=5 confirmation scores. Outputs: outputs/evaluation/x_selection/.'
 from __future__ import annotations
 
 import importlib.util
@@ -6,7 +6,7 @@ from pathlib import Path
 
 import matplotlib
 
-matplotlib.use("Agg")  # 使用无窗口绘图后端保存文件。
+matplotlib.use("Agg")  # Save figures with a noninteractive backend.
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
@@ -35,14 +35,14 @@ LIGHT = "#F4F7F9"
 
 
 def require(path: Path) -> Path:
-    """检查前序步骤所需文件是否存在。"""
+    'Check that required files from earlier stages exist.'
     if not path.is_file():
         raise FileNotFoundError(f"Required input is missing: {path}")
     return path
 
 
 def load_model_module():
-    """加载已有评分模块。"""
+    'Load the existing scoring module.'
     spec = importlib.util.spec_from_file_location("m5_x_scorer", require(MODEL_FILE))
     if spec is None or spec.loader is None:
         raise ImportError(f"Cannot import scorer from {MODEL_FILE}")
@@ -52,7 +52,7 @@ def load_model_module():
 
 
 def score_missing_x5_confirmation() -> pd.DataFrame:
-    """在相同的 16 个确认期起点评价统一窗口 x=5，并缓存结果。"""
+    'Evaluate shared x=5 on the same 16 confirmation origins and cache the scores.'
     scorer = load_model_module()
     expected = list(scorer.CONFIRM_ORIGINS)
     if EXTRA_FILE.is_file():
@@ -88,7 +88,7 @@ def score_missing_x5_confirmation() -> pd.DataFrame:
 
 
 def shared_rows(scores: pd.DataFrame, x: int, origins: list[int]) -> pd.DataFrame:
-    """提取各回测起点的统一窗口得分。"""
+    'Extract shared-window scores for each requested origin.'
     rows = scores.loc[
         scores["origin_d"].isin(origins)
         & scores["FOODS"].eq(x)
@@ -117,7 +117,7 @@ def save_figure(fig: plt.Figure, stem: str) -> None:
 
 
 def plot_shared_curve(means: pd.DataFrame) -> pd.DataFrame:
-    """展示各窗口相对基准的差距，并放大相近候选之间的差异。"""
+    'Show gaps from the baseline and zoom in on close candidates.'
     shared = means.loc[
         means["FOODS"].eq(means["HOBBIES"])
         & means["HOBBIES"].eq(means["HOUSEHOLD"]),
@@ -150,7 +150,7 @@ def plot_shared_curve(means: pd.DataFrame) -> pd.DataFrame:
 
 
 def plot_joint_profiles(means: pd.DataFrame) -> None:
-    """固定一个品类的窗口，展示另外两个品类取最优组合时的完整三品类得分。"""
+    'Fix one category window and show the best complete vector over the other two categories.'
     fig, axes = plt.subplots(1, 3, figsize=(13.2, 4.3), sharey=True,
                              constrained_layout=True)
     for ax, category in zip(axes, ("FOODS", "HOBBIES", "HOUSEHOLD")):
@@ -175,7 +175,7 @@ def plot_joint_profiles(means: pd.DataFrame) -> None:
 
 
 def plot_all_vectors(means: pd.DataFrame) -> None:
-    """用九张热图展示全部三品类窗口组合。"""
+    'Show all three-category window vectors in nine heatmaps.'
     xs = [1, 2, 3, 4, 5, 6, 8, 12, 16]
     values = means["wrmsse"].to_numpy(dtype=float)
     low, high = np.quantile(values, [0.05, 0.95])
@@ -216,7 +216,7 @@ def plot_all_vectors(means: pd.DataFrame) -> None:
 
 
 def plot_selection_stages(stages: pd.DataFrame) -> None:
-    """展示开发期候选在确认期和审计期的得分。"""
+    'Trace development-selected candidates through confirmation and audit.'
     choices = {
         "development_selected_joint_vector": ("Joint category vector", ORANGE, "-"),
         "development_selected_shared_x": ("Best shared x", BLUE, "-"),
@@ -267,7 +267,7 @@ def paired_table(scores: pd.DataFrame, origins: list[int], split: str,
 
 
 def plot_paired(paired: pd.DataFrame) -> None:
-    """按时间展示 x=8 与 x=5 的配对得分差；负值表示 x=8 更好。"""
+    'Plot chronological x=8 minus x=5 score differences; negative values favor x=8.'
     fig, axes = plt.subplots(2, 1, figsize=(12.8, 6.8), constrained_layout=True)
     for ax, split in zip(axes, ("development", "confirmation")):
         part = paired.loc[paired["split"].eq(split)].sort_values("origin_d")
@@ -291,7 +291,7 @@ def plot_paired(paired: pd.DataFrame) -> None:
 
 
 def plot_example(calendar: pd.DataFrame) -> None:
-    """展示预先选定的 HOBBIES 商品门店序列。"""
+    'Show the preselected HOBBIES item-store example.'
     selection = pd.read_csv(require(EXAMPLE_SELECTION_FILE))
     item = selection.loc[selection["cat_id"].eq("HOBBIES"), "id"]
     if len(item) != 1:
@@ -346,7 +346,7 @@ def main() -> None:
     scorer = load_model_module()
     extra = score_missing_x5_confirmation()
     combined = pd.concat([scores, extra], ignore_index=True)
-    # 合并已有 x=5 结果后，按起点和窗口组合去重。
+    # Deduplicate combined x=5 results by origin and window vector.
     combined = combined.drop_duplicates(["origin_d", "FOODS", "HOBBIES", "HOUSEHOLD"], keep="first")
     calendar = pd.read_csv(require(CALENDAR_FILE), usecols=["d_num", "date"])
     date_lookup = calendar.set_index("d_num")["date"]

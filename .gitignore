@@ -1,4 +1,4 @@
-# Python 环境与缓存
+# Python environments and caches
 .venv/
 venv/
 __pycache__/
@@ -6,7 +6,7 @@ __pycache__/
 .ipynb_checkpoints/
 .pytest_cache/
 
-# 本地配置
+# Local configuration
 .env
 .env.*
 !.env.example
@@ -15,11 +15,11 @@ __pycache__/
 Thumbs.db
 .DS_Store
 
-# 数据由使用者下载，处理后文件由脚本生成
+# Download raw data locally and generate processed files
 /data/*
 !/data/README.md
 
-# 历史资料、报告及演示制作文件
+# Historical materials, reports, and presentation builds
 /references/
 /requirements/
 /reports/
@@ -27,7 +27,7 @@ Thumbs.db
 /.codex-presentation-build*/
 *.zip
 
-# 仅保留数据探索和正式实验目录中的结果
+# Retain exploratory and experiment results only
 /outputs/*
 !/outputs/README.md
 !/outputs/data_prep/
@@ -35,7 +35,7 @@ Thumbs.db
 /outputs/data_prep/tables/
 /outputs/evaluation/champion_comparison/
 
-# 完整预测、日志、旧页面和重复格式图片由脚本重新生成
+# Regenerate full predictions, logs, old pages, and duplicate image formats
 /outputs/**/forecast*.csv
 /outputs/**/rho_x8_forecast.csv
 /outputs/**/grouped_trend_forecast.csv
@@ -44,5 +44,5 @@ Thumbs.db
 /outputs/**/*.html
 /outputs/**/*.svg
 
-# 图形库运行时缓存
+# Plotting-library caches
 **/mplconfig/

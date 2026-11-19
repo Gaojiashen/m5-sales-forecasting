@@ -1,4 +1,4 @@
-"""通过滚动回测的 WRMSSE 选择同星期平均窗口，比较统一窗口与分品类窗口。"""
+'Select same-weekday averaging windows by rolling WRMSSE, comparing shared and category-specific windows.'
 from __future__ import annotations
 
 import itertools
@@ -16,7 +16,7 @@ OUT = ROOT / "outputs" / "evaluation" / "x_selection"
 CATEGORIES = ("FOODS", "HOBBIES", "HOUSEHOLD")
 X_VALUES = (1, 2, 3, 4, 5, 6, 8, 12, 16)
 HORIZON = 28
-ORIGINS = tuple(range(121, 1886, 28))  # 共 64 个起点，最后一个目标日为 d_1913。
+ORIGINS = tuple(range(121, 1886, 28))  # 64 origins; the last target day is d_1913.
 DEV_ORIGINS = ORIGINS[:32]
 CONFIRM_ORIGINS = ORIGINS[32:48]
 AUDIT_ORIGINS = ORIGINS[48:]
@@ -30,7 +30,7 @@ LEVELS = [
     ("Item", ("item_id",)), ("Item × State", ("item_id", "state_id")),
     ("Item × Store", ("item_id", "store_id")),
 ]
-GLOBAL_LEVELS = {0, 1, 2}  # 跨品类聚合的层级
+GLOBAL_LEVELS = {0, 1, 2}  # Levels that aggregate across categories
 
 
 def hierarchy(meta: pd.DataFrame) -> list[sparse.csr_matrix]:
@@ -50,14 +50,14 @@ def hierarchy(meta: pd.DataFrame) -> list[sparse.csr_matrix]:
 
 
 def category_layout(meta: pd.DataFrame, aggs):
-    """预先计算品类掩码和各品类对应的聚合子矩阵。"""
+    'Precompute category masks and sliced aggregation matrices.'
     cat_labels = meta.cat_id.to_numpy()
     categories = {c: cat_labels == c for c in CATEGORIES}
     node_masks = {}
     for lev, (_, keys) in enumerate(LEVELS):
         if lev in GLOBAL_LEVELS:
             continue
-        if lev == 11:  # 第 12 层使用单位矩阵，行顺序与元数据相同。
+        if lev == 11:  # Level 12 is identity and retains metadata order.
             node_cat = cat_labels
         else:
             codes = (np.zeros(len(meta), dtype=np.int32) if not keys else
@@ -75,7 +75,7 @@ def category_layout(meta: pd.DataFrame, aggs):
 
 def scales_and_weights(train: np.ndarray, meta: pd.DataFrame, aggs, calendar: pd.DataFrame,
                        prices: pd.DataFrame, origin: int):
-    """计算当前起点的节点缩放分母和销售额权重。缩放分母为零的节点不参与滚动评分，其余节点在各层级内重新归一化权重；同时记录被排除节点的原始销售额占比。"""
+    'Compute origin-specific scales and revenue weights. Exclude zero-scale nodes from rolling scores, renormalize within each level, and record their original revenue shares.'
     start = max(1, origin - HORIZON + 1)
     recent = train[:, start - 1:origin].astype(np.float64)
     weeks = set(calendar.loc[calendar.d_num.between(start, origin), "wm_yr_wk"].astype(int))
@@ -130,7 +130,7 @@ def scales_and_weights(train: np.ndarray, meta: pd.DataFrame, aggs, calendar: pd
 
 def first_price_days(meta: pd.DataFrame, prices: pd.DataFrame,
                      calendar: pd.DataFrame) -> np.ndarray:
-    """按元数据行顺序返回各商品门店序列首次有价格记录的日期。"""
+    'Return the first priced date per item-store series in metadata order.'
     first_week = prices.groupby(["item_id", "store_id"], sort=False).wm_yr_wk.min()
     week_start = calendar.groupby("wm_yr_wk").d_num.min()
     first_day = first_week.map(week_start)
@@ -140,16 +140,16 @@ def first_price_days(meta: pd.DataFrame, prices: pd.DataFrame,
 
 def candidate_leaf(train: np.ndarray, rows: np.ndarray, origin: int, x: int,
                    release: np.ndarray) -> np.ndarray:
-    """计算七个星期位置的平均销量，再重复为 28 天预测。均值包含开售后的零销量，开售前的日期不计入分母。"""
+    'Forecast seven weekday positions and repeat them for 28 days. Include post-release zeros; omit pre-release dates from the denominator.'
     week = np.zeros((len(rows), 7), dtype=np.float64)
     for h in range(7):
-        # 历史日 origin-6+h 对应目标日 origin+1+h 的前一周。
+        # Historical day origin-6+h is one week before target day origin+1+h.
         last = origin - 6 + h
         days = last - 7 * np.arange(x)
         days = days[(days >= 1)]
         if not len(days):
             continue
-        # 仅纳入开售后的历史周，其中零销量按普通观测参与平均。
+        # Include released historical weeks, including observed zero sales.
         values = train[np.ix_(rows, days - 1)].astype(np.float64)
         available = (days[None, :] >= release[rows, None])
         counts = available.sum(axis=1)
@@ -160,7 +160,7 @@ def candidate_leaf(train: np.ndarray, rows: np.ndarray, origin: int, x: int,
 
 def evaluate_origin(meta, train, calendar, prices, first_release, aggs, layout,
                     origin, vectors):
-    """在同一起点，使用相同的有效节点评价各窗口组合。"""
+    'Evaluate window vectors using the same scorable nodes at each origin.'
     if not np.isfinite(train[:, :origin]).all() or np.any(train[:, :origin] < 0):
         raise ValueError(f"Sales history through d_{origin} must be finite and nonnegative")
     target = np.arange(origin + 1, origin + HORIZON + 1)
@@ -168,14 +168,14 @@ def evaluate_origin(meta, train, calendar, prices, first_release, aggs, layout,
     scales, weights, coverage_rows = scales_and_weights(
         train, meta, aggs, calendar, prices, origin
     )
-    # 将晚于当前起点的首次定价日期设为不可达日期，对应序列预测为零。
+    # Mask future first-price dates to an unreachable day, producing zero forecasts.
     release = np.where(first_release <= origin, first_release, 10**9)
     cats, node_masks, cat_rows, cat_aggs = layout
-    # 每个 x 缓存一次品类聚合；总量、州和门店层级需要联合评价多品类组合。
+    # Cache category aggregates per x; total, state, and store levels require joint vector scoring.
     cat_nodes = {c: {} for c in CATEGORIES}
     global_nodes = {c: {} for c in CATEGORIES}
     actual_aggregates = [np.asarray(agg @ actual) for agg in aggs]
-    # 开发期计算全部九种窗口；后续固定候选比较只计算所需窗口。
+    # Evaluate all nine windows on development and only requested windows for fixed comparisons.
     needed_x = {
         c: tuple(sorted({vector[ci] for vector in vectors}))
         for ci, c in enumerate(CATEGORIES)
@@ -190,7 +190,7 @@ def evaluate_origin(meta, train, calendar, prices, first_release, aggs, layout,
                     global_nodes[c][(lev, x)] = block
                 else:
                     cat_nodes[c][(lev, x)] = block[node_masks[lev][c]]
-    # 对节点归属单一品类的层级，预先计算各品类和窗口的得分。
+    # Precompute category/window scores for levels contained within one category.
     cat_loss = {c: {} for c in CATEGORIES}
     for c in CATEGORIES:
         for x in needed_x[c]:
@@ -198,7 +198,7 @@ def evaluate_origin(meta, train, calendar, prices, first_release, aggs, layout,
             for lev, _ in enumerate(LEVELS):
                 if lev in GLOBAL_LEVELS:
                     continue
-                # 提取当前品类节点对应的真实销量和预测行。
+                # Select actual and forecast rows for the current category nodes.
                 agg = aggs[lev]
                 keep = node_masks[lev][c]
                 pred = cat_nodes[c][(lev, x)]
@@ -241,7 +241,7 @@ def main():
     vectors = list(itertools.product(X_VALUES, repeat=3))
     score_rows = []
     coverage_rows = []
-    # 在开发期起点搜索全部窗口组合。
+    # Search all window combinations on development origins.
     for origin in DEV_ORIGINS:
         origin_scores, origin_coverage = evaluate_origin(
             meta, train, calendar, prices, first_release, aggs, layout, origin, vectors
@@ -274,7 +274,7 @@ def main():
     joint_confirmation = float(confirmation_mean[chosen])
     shared_confirmation = float(confirmation_mean[shared_vector])
     naive_confirmation = float(confirmation_mean[naive_vector])
-    # 确认期均分最低者胜出；并列时依次优先 x=1、统一窗口、分品类窗口。
+    # Lowest confirmation mean wins; ties prefer x=1, then shared x, then category vectors.
     gate_options = [
         (naive_confirmation, 0, "seasonal_naive_x1", naive_vector),
         (shared_confirmation, 1, "shared_x", shared_vector),

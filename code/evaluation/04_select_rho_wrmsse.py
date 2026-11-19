@@ -1,4 +1,4 @@
-"""为八周同星期预测选择分组近期衰减系数 rho。四折时间回测使用较早起点拟合、随后八个起点验证。rho=0 使用最近一次有效同星期观测，rho=1 对八周等权平均。"""
+'Select grouped recency factors for eight-week same-weekday forecasts. Four expanding temporal folds validate on the next eight origins. rho=0 uses the latest eligible observation; rho=1 averages eight weeks equally.'
 from __future__ import annotations
 
 import importlib.util
@@ -57,13 +57,13 @@ def grouping(meta: pd.DataFrame, partition: str) -> tuple[np.ndarray, list[str]]
 
 
 def weekday_history(train: np.ndarray, origin: int, release: np.ndarray):
-    """返回各星期位置最近至多八周的销量及可用标记。"""
+    'Return up to eight same-weekday observations and availability flags.'
     result = []
     for weekday in range(7):
         last_day = origin - 6 + weekday
         days = last_day - 7 * np.arange(X)
         days = days[days >= 1]
-        # 历史数组保留整数类型，在 profile() 加权求和时转换。
+        # Keep integer history; profile() casts when weighting.
         values = np.asarray(train[:, days - 1])
         available = days[None, :] >= release[:, None]
         result.append((values, available))
@@ -71,10 +71,10 @@ def weekday_history(train: np.ndarray, origin: int, release: np.ndarray):
 
 
 def profile(history, rho: float) -> np.ndarray:
-    """计算七个星期位置的加权均值，开售前的周不计入分母。"""
+    'Compute a weighted seven-day profile, excluding pre-release weeks.'
     daily = np.zeros((history[0][0].shape[0], 7), dtype=np.float64)
     for weekday, (values, available) in enumerate(history):
-        # k=0 对应最近观测，rho=0 对应季节性朴素预测。
+        # k=0 is newest; rho=0 is the seasonal-naive limit.
         w = np.power(np.float32(rho), np.arange(values.shape[1], dtype=np.float32))
         if rho == 0:
             w[1:] = 0
@@ -87,10 +87,10 @@ def profile(history, rho: float) -> np.ndarray:
 
 
 def origin_context(m, train, meta, calendar, prices, first_release, aggs, origin):
-    """缓存各起点的评分数组，以及按星期汇总的真实销量统计量。"""
+    'Cache origin-specific metric arrays and weekday truth moments.'
     actual = np.asarray(train[:, origin:origin + HORIZON], dtype=np.float64)
     scales, weights, coverage = m.scales_and_weights(train, meta, aggs, calendar, prices, origin)
-    # 四个预测周共享星期曲线；缓存真实销量的一、二阶矩，使每层评分仅需七次稀疏聚合。
+    # The four weeks repeat; cache first and second truth moments to score with seven sparse products per level.
     stats = []
     for agg in aggs:
         nodes = np.asarray(agg @ actual)
@@ -116,7 +116,7 @@ def score_profile(context, leaf7: np.ndarray, aggs) -> float:
 
 
 def hierarchy_leaf_codes(m, meta: pd.DataFrame) -> list[np.ndarray]:
-    """建立底层序列到各层级节点行号的映射。"""
+    'Map leaves to node rows at each hierarchy level.'
     result = []
     for lev, (_, keys) in enumerate(m.LEVELS):
         if lev == 11:
@@ -155,7 +155,7 @@ def initial_coordinate_state(context, groups, aggs):
 
 
 def score_coordinate_choice(context, state, rows, rho, history, groups, node_codes, aggs):
-    """仅更新当前坐标影响的层级节点，计算该候选得分。"""
+    'Score a coordinate candidate by updating only the affected hierarchy nodes.'
     leaf_new = profile([(v[rows], a[rows]) for v, a in history], rho)
     delta_leaf = leaf_new - state["leaf"][rows]
     value = state["score"]
@@ -193,11 +193,11 @@ def candidate_profile(context, groups: np.ndarray, vector: np.ndarray, cache: di
 
 
 def fit_partition(contexts, aggs, groups, group_labels, partition, node_codes):
-    """通过坐标下降最小化训练起点上的平均全层级 WRMSSE。"""
+    'Use coordinate descent to minimize mean training-origin full-hierarchy WRMSSE.'
     vector = np.ones(len(group_labels), dtype=np.float64)
     states = [initial_coordinate_state(context, groups, aggs) for context in contexts]
     group_rows = [np.flatnonzero(groups == code) for code in range(len(group_labels))]
-    # 坐标下降从等权重初值开始，按各分组依次搜索 rho。
+    # Start coordinate descent from equal weights and search each group rho.
     for pass_no in range(2):
         changed = False
         for code in range(len(vector)):
@@ -229,7 +229,7 @@ def fit_partition(contexts, aggs, groups, group_labels, partition, node_codes):
 
 
 def block_bootstrap(deltas: pd.DataFrame) -> dict:
-    """执行配对移动块自助抽样，每折抽取两个连续四起点的区块。"""
+    'Run a paired moving-block bootstrap using two four-origin blocks per fold.'
     rng = np.random.default_rng(SEED)
     folds = sorted(deltas.fold.unique())
     samples = np.empty(BOOTSTRAP_REPS, dtype=np.float64)
@@ -261,7 +261,7 @@ def block_bootstrap(deltas: pd.DataFrame) -> dict:
 
 
 def select_partition(comparisons: pd.DataFrame):
-    """以平均得分最优模型为参照，按配对单标准误规则选择较简单的分组。"""
+    'Choose the simplest grouping within the paired one-standard-error rule.'
     means = comparisons.groupby("partition", as_index=False).wrmsse.mean().rename(
         columns={"wrmsse": "validation_wrmsse"})
     means["complexity"] = means.partition.map({p: i for i, p in enumerate(PARTITIONS)})
@@ -274,7 +274,7 @@ def select_partition(comparisons: pd.DataFrame):
         for partition in PARTITIONS:
             paired_rows = []
             for (fold, origin), row in pivot.iterrows():
-                # 相对最优模型的损失差为候选减最优；相对全局模型的改进为全局基准减候选，正值表示改进。
+                # Loss versus best is candidate minus best; gain versus global is baseline minus candidate.
                 delta = (row[partition] - row[baseline_partition] if comparator == "best"
                          else row[baseline_partition] - row[partition])
                 paired_rows.append({"fold": fold, "origin_d": origin,
@@ -391,7 +391,7 @@ def main():
     node_codes = hierarchy_leaf_codes(m, meta)
     first_release = m.first_price_days(meta, prices, calendar)
     origins = tuple(m.ORIGINS)
-    # 四折拟合和验证共用各起点的评分上下文。
+    # Reuse origin metric contexts across fitting and validation folds.
     contexts = {}
     for origin in origins:
         contexts[origin] = origin_context(m, train, meta, calendar, prices, first_release, aggs, origin)
@@ -441,13 +441,13 @@ def main():
     means.to_csv(OUT / "partition_validation_summary.csv", index=False)
     bootstrap.to_csv(OUT / "paired_bootstrap_deltas.csv", index=False)
 
-    # 使用全部 64 个滚动起点重新拟合选定的分组结构。
+    # Refit the selected grouping on all 64 rolling origins.
     groups, labels = grouping(meta, chosen_partition)
     final_rho = fit_partition([contexts[o] for o in origins], aggs, groups, labels,
                                chosen_partition, node_codes)
     final_table = pd.DataFrame({"partition": chosen_partition, "group": labels, "rho": final_rho})
     final_table.to_csv(OUT / "learned_rho_final.csv", index=False)
-    # 从最新起点 d_1913 生成 28 天底层预测。
+    # Forecast 28 days from the latest origin d_1913.
     final_release = np.where(first_release <= 1913, first_release, 10**9)
     final_context = {"history": weekday_history(train, 1913, final_release),
                      "profile_cache": {}, "cache_namespace": "final_forecast"}
@@ -457,7 +457,7 @@ def main():
     pred_df.insert(0, "id", meta.item_id.astype(str) + "_" + meta.store_id.astype(str) + "_validation")
     pred_df.to_csv(OUT / "rho_x8_forecast.csv", index=False)
 
-    # 计算留出期 WRMSSE，并与已保存的 sNaive 得分比较。
+    # Score the holdout and compare with the saved sNaive result.
     official = load_module(Path(__file__).with_name("01_snaive_wrmsse.py"), "m5_official_eval")
     actual = official.load_test_actuals(meta)
     cal_full = pd.read_csv(RAW / "calendar.csv", usecols=["d", "date", "wm_yr_wk"])
@@ -483,7 +483,7 @@ def main():
     if args.resume_selection and search_path.is_file():
         search = pd.read_csv(search_path)
     else:
-        # 绘制全局 rho 候选的得分曲线。
+        # Plot the global rho search curve.
         curve_rows = []
         g, labels0 = grouping(meta, "global")
         for rho in RHO_VALUES:

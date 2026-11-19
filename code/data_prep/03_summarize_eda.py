@@ -1,23 +1,4 @@
-"""
-第 3 步：计算 M5 探索性分析的表。
-输入位于 data/processed/：
-- sales_matrix.npy、sales_metadata.csv：销量矩阵及对应身份信息。
-- calendar_clean.csv：日期与日历信息。
-- sell_prices_clean.csv.gz：每周价格表。
-- manifest.json：要求存在，作为上一步输出文件之一。
-
-输出至 outputs/data_prep/tables/：
-- daily_summary.csv：每日总销量、零销量比例和 28 天移动平均。
-- weekday_summary.csv：按星期汇总销量均值、中位数和天数。
-- category_summary.csv、category_daily.csv：品类汇总及每日走势。
-- state_summary.csv、state_daily.csv：州汇总及每日走势。
-- series_summary.csv：各序列的销量和稀疏程度统计。
-- example_series_selection.csv：选中的代表序列及统计量。
-- example_series_daily.csv：代表序列最近 365 天的真实销量。
-- example_price_series.csv：示例商品的价格轨迹。
-
-分析摘要：outputs/data_prep/reports/eda_summary.json。
-"""
+'Step 3: compute exploratory statistics for M5.\nInputs in data/processed/: the sales matrix, metadata, calendar, weekly prices, and manifest.\nOutputs in outputs/data_prep/tables/: daily and weekday summaries; category and state summaries and daily profiles; per-series statistics; representative series and their last 365 observed days; and a weekly-price example.\nSummary: outputs/data_prep/reports/eda_summary.json.'
 
 import json
 from pathlib import Path
@@ -33,13 +14,13 @@ REPORTS = ROOT / "outputs" / "data_prep" / "reports"
 
 
 def load_inputs() -> tuple[np.memmap, pd.DataFrame, pd.DataFrame]:
-    """检查矩阵行列与元数据、日历严格对应。"""
+    'Check matrix dimensions and alignment with metadata and calendar.'
     paths = [PROCESSED / name for name in (
         "manifest.json", "sales_matrix.npy", "sales_metadata.csv", "calendar_clean.csv"
     )]
     missing = [str(path) for path in paths if not path.is_file()]
     if missing:
-        raise FileNotFoundError(f"请先运行 02_prepare_clean.py，缺少：{missing}")
+        raise FileNotFoundError(f"Run 02_prepare_clean.py first; missing: {missing}")
     matrix = np.load(paths[1], mmap_mode="r")
     metadata = pd.read_csv(paths[2])
     calendar = pd.read_csv(paths[3], parse_dates=["date"])
@@ -48,7 +29,7 @@ def load_inputs() -> tuple[np.memmap, pd.DataFrame, pd.DataFrame]:
 
 
 def summarize_daily(matrix: np.memmap, calendar: pd.DataFrame) -> pd.DataFrame:
-    """每日总销量和零值比例，用于看趋势、停业日和稀疏程度。"""
+    'Summarize daily totals, zero-sales shares, and rolling trends.'
     daily = calendar[["d_num", "date", "wm_yr_wk", "has_event"]].copy()
     daily["total_units"] = matrix.sum(axis=0, dtype=np.int64)
     daily["zero_series_share"] = (matrix == 0).mean(axis=0)
@@ -58,7 +39,7 @@ def summarize_daily(matrix: np.memmap, calendar: pd.DataFrame) -> pd.DataFrame:
 
 
 def summarize_weekday(daily: pd.DataFrame) -> pd.DataFrame:
-    """从日期计算真正的星期；M5 原始 wday 的编号方式不同，改为采用Mon-0，Sat-6的编号"""
+    'Derive weekdays from dates using Monday=0 through Sunday=6.'
     work = daily.assign(weekday_num=daily["date"].dt.weekday)
     weekday = work.groupby("weekday_num", as_index=False).agg(
         mean_units=("total_units", "mean"),
@@ -72,7 +53,7 @@ def summarize_weekday(daily: pd.DataFrame) -> pd.DataFrame:
 
 def summarize_group(matrix: np.memmap, metadata: pd.DataFrame,
                     calendar: pd.DataFrame, column: str, prefix: str) -> pd.DataFrame:
-    """不同品类、不同州差异"""
+    'Summarize differences across categories or states.'
     rows = []
     all_days = []
     for label in sorted(metadata[column].dropna().unique()):
@@ -103,12 +84,12 @@ def summarize_group(matrix: np.memmap, metadata: pd.DataFrame,
 
 def summarize_series(matrix: np.memmap, metadata: pd.DataFrame,
                      calendar: pd.DataFrame) -> pd.DataFrame:
-    """保存全历史及最近一年特征，并选出每类可复现的代表序列。"""
+    'Summarize full-history and recent-year statistics and select reproducible examples.'
     series = metadata[["id", "item_id", "cat_id", "store_id"]].copy()
     series.insert(0, "row_index", np.arange(len(metadata), dtype=np.int32))
     series["mean_daily_units"] = matrix.mean(axis=1)
     series["zero_day_share"] = (matrix == 0).mean(axis=1)
-    # 最近 365 个已观测日；前后 90 天销量用于查看序列变化。
+    # Use the last 365 observed days; compare the first and last 90-day totals.
     recent_start = matrix.shape[1] - 365
     recent = matrix[:, recent_start:]
     series["mean_daily_units_last365"] = recent.mean(axis=1)
@@ -117,12 +98,12 @@ def summarize_series(matrix: np.memmap, metadata: pd.DataFrame,
     series["last90_units_last365"] = recent[:, -90:].sum(axis=1)
     series.to_csv(TABLES / "series_summary.csv", index=False)
 
-    # 要求最近一年每个自然月都有正销量，避免把季节性停卖或短历史序列
-    # 当作常规代表；再选取最接近品类中位数的销量水平与零值率。
+    # Require positive sales in every covered calendar month.
+    # Then select levels and zero shares close to category medians.
     recent_dates = calendar["date"].iloc[recent_start:].reset_index(drop=True)
     month_codes = recent_dates.dt.to_period("M").astype(str).to_numpy()
     if len(month_codes) != 365:
-        raise ValueError("最近一年日历与销量矩阵长度不一致")
+        raise ValueError('Recent-year calendar and sales lengths differ')
     candidate_rows = []
     for cat_id in sorted(series["cat_id"].dropna().unique()):
         group = series.loc[series["cat_id"] == cat_id]
@@ -132,11 +113,11 @@ def summarize_series(matrix: np.memmap, metadata: pd.DataFrame,
             if all(np.any(values[month_codes == month] > 0) for month in np.unique(month_codes)):
                 eligible.append(int(row.row_index))
         if not eligible:
-            raise ValueError(f"品类 {cat_id} 没有最近 365 天所覆盖的各自然月均有销量的序列")
+            raise ValueError(f"Category {cat_id} has no series with sales in every calendar month covered by the last 365 days")
         pool = group.loc[group["row_index"].isin(eligible)].copy()
         med_mean = float(pool["mean_daily_units_last365"].median())
         med_zero = float(pool["zero_day_share_last365"].median())
-        # 标准化绝对距离，避免销量和比例的量纲影响；排序字段确保稳定打破并列。
+        # Standardize distances and use stable sort keys to break ties.
         mean_scale = max(float(pool["mean_daily_units_last365"].std(ddof=0)), 1e-12)
         zero_scale = max(float(pool["zero_day_share_last365"].std(ddof=0)), 1e-12)
         pool["_distance"] = (
@@ -163,10 +144,10 @@ def summarize_series(matrix: np.memmap, metadata: pd.DataFrame,
 
 
 def choose_price_example(metadata: pd.DataFrame, calendar: pd.DataFrame) -> dict:
-    """从固定样本里找价格变化较多的商品，展示周价格的变化方式。"""
+    'Choose a price-varying series from a fixed candidate sample.'
     price_path = PROCESSED / "sell_prices_clean.csv.gz"
     if not price_path.is_file():
-        raise FileNotFoundError(f"缺少处理后价格文件：{price_path}")
+        raise FileNotFoundError(f"Missing processed price file: {price_path}")
     positions = np.unique(np.linspace(0, len(metadata) - 1, 240, dtype=int))
     candidates = metadata.iloc[positions][["store_id", "item_id"]].drop_duplicates()
     candidate_items = set(candidates["item_id"])
@@ -181,7 +162,7 @@ def choose_price_example(metadata: pd.DataFrame, calendar: pd.DataFrame) -> dict
             if not matched.empty:
                 pieces.append(matched)
     if not pieces:
-        raise ValueError("候选商品中没有找到价格记录")
+        raise ValueError('No price records found for the candidate series')
     prices = pd.concat(pieces, ignore_index=True)
     ranking = prices.groupby(["store_id", "item_id"]).agg(
         distinct_prices=("sell_price", "nunique"), weeks=("sell_price", "size")
@@ -195,7 +176,7 @@ def choose_price_example(metadata: pd.DataFrame, calendar: pd.DataFrame) -> dict
         "store_id": store_id, "item_id": item_id,
         "observed_weeks": len(example),
         "distinct_prices": int(example["sell_price"].nunique()),
-        "selection": "240 个等距候选序列中价格种类最多者；仅作展示",
+        "selection": 'Most distinct prices among 240 evenly spaced candidate series; illustrative example',
     }
 
 
@@ -203,16 +184,16 @@ def main() -> None:
     TABLES.mkdir(parents=True, exist_ok=True)
     REPORTS.mkdir(parents=True, exist_ok=True)
     matrix, metadata, calendar = load_inputs()
-    print("1/5 汇总每日销量…")
+    print('1/5 Summarizing daily sales...')
     daily = summarize_daily(matrix, calendar)
-    print("2/5 汇总星期效应…")
+    print('2/5 Summarizing weekday patterns...')
     summarize_weekday(daily)
-    print("3/5 汇总品类与州…")
+    print('3/5 Summarizing categories and states...')
     categories = summarize_group(matrix, metadata, calendar, "cat_id", "category")
     states = summarize_group(matrix, metadata, calendar, "state_id", "state")
-    print("4/5 汇总每条序列的稀疏程度…")
+    print('4/5 Summarizing series sparsity...')
     series = summarize_series(matrix, metadata, calendar)
-    print("5/5 选取价格轨迹示例…")
+    print('5/5 Selecting a price example...')
     price_example = choose_price_example(metadata, calendar)
     summary = {
         "source_days": [1, 1913],
@@ -224,14 +205,14 @@ def main() -> None:
         "price_example": price_example,
         "series_examples": {
             "count": 3,
-            "selection": "每个品类在最近 365 天的每个自然月均至少有一天正销量；在合格序列中，按最近一年日均销量和零销量占比相对品类中位数的标准化绝对距离之和选最近者，完全并列时按 item_id、store_id、id 字典序确定。",
-            "daily_table": "example_series_daily.csv（最近 365 天实际日销量）",
+            "selection": 'Require positive sales in every calendar month covered by the last 365 days. Among eligible series in each category, minimize the sum of standardized absolute distances from the median daily sales and zero-sales share; break ties by item_id, store_id, and id.',
+            "daily_table": 'example_series_daily.csv (actual daily sales for the last 365 days)',
         },
     }
     (REPORTS / "eda_summary.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"
     )
-    print(f"汇总表：{TABLES}")
+    print(f"Summary tables: {TABLES}")
 
 
 if __name__ == "__main__":

@@ -63,12 +63,12 @@
     "item_id": "FOODS_1_034",
     "observed_weeks": 258,
     "distinct_prices": 15,
-    "selection": "240 个等距候选序列中价格种类最多者；仅作展示"
+    "selection": "Most distinct prices among 240 evenly spaced candidate series; illustrative example"
   },
   "series_examples": {
     "count": 3,
-    "selection": "每个品类在最近 365 天的每个自然月均至少有一天正销量；在合格序列中，按最近一年日均销量和零销量占比相对品类中位数的标准化绝对距离之和选最近者，完全并列时按 item_id、store_id、id 字典序确定。",
-    "daily_table": "example_series_daily.csv（最近 365 天实际日销量；预测区间不填入虚构值）"
+    "selection": "Require positive sales in every calendar month covered by the last 365 days. Among eligible series in each category, minimize the sum of standardized absolute distances from the median daily sales and zero-sales share; break ties by item_id, store_id, and id.",
+    "daily_table": "example_series_daily.csv (actual sales for the last 365 days)"
   },
-  "caution": "图表可用完整历史探索；建模回测须先切分时间，再计算特征。"
+  "caution": "Explore the full training history; compute model features after splitting each backtest origin."
 }

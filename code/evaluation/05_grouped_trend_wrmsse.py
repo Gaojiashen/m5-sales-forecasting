@@ -1,4 +1,4 @@
-"""比较 M5 分组水平不变、线性趋势和阻尼趋势预测。水平不变模型使用州×品类 rho 星期曲线；趋势斜率由最近八个完整周的汇总销量及同组 rho 权重估计。阻尼系数在开发期选择，随后进行确认期和审计期比较。"""
+'Compare constant, linear, and damped grouped M5 forecasts. Reuse state-category rho profiles; fit slopes from eight complete aggregate weeks. Select damping on development, then compare confirmation and audit scores.'
 from __future__ import annotations
 
 import argparse
@@ -44,8 +44,8 @@ def setup_groups(meta: pd.DataFrame, rho_table: pd.DataFrame):
 
 
 def estimate_group_trends(train, origin, codes, rhos, leaf_base):
-    """对最近八个完整周的日均总销量进行加权最小二乘拟合。"""
-    # 按回测起点向前划分连续七天的周区间，最早一周始于 origin-55。
+    'Fit weighted least squares to daily mean sales over eight complete weeks.'
+    # Use seven-day blocks ending at the origin; the oldest begins at origin-55.
     days = origin - np.arange(55, -1, -1)
     if days.min() < 1:
         raise ValueError(f"Origin d_{origin} lacks eight complete history weeks")
@@ -56,7 +56,7 @@ def estimate_group_trends(train, origin, codes, rhos, leaf_base):
         totals[g] = daily[codes == g].sum(axis=0)
     daily_by_week = totals.reshape(groups, 8, 7)
     week_means = daily_by_week.mean(axis=2)
-    # 最新周的索引为 7，权重沿用该组已选的 rho。
+    # The newest week has index 7; reuse the selected group rho.
     weights = np.power(rhos[:, None], np.arange(7, -1, -1)[None, :])
     weights[rhos == 0, :-1] = 0
     weights /= weights.sum(axis=1, keepdims=True)
@@ -67,13 +67,13 @@ def estimate_group_trends(train, origin, codes, rhos, leaf_base):
     b = (weights * (t[None, :] - tbar[:, None]) * (week_means - a[:, None])).sum(axis=1)
     b = np.divide(b, denom, out=np.zeros(groups), where=denom > 0)
     ell0 = a - b * tbar
-    # 比率分母取水平不变模型的分组日均预测。
+    # Use the constant forecast's group daily mean as the ratio denominator.
     base_mean = np.zeros(groups, dtype=float)
     for g in range(groups):
         base_mean[g] = leaf_base[codes == g].sum() / 7.0
     weekday_effect = (weights[:, :, None] *
                       (daily_by_week - week_means[:, :, None])).sum(axis=1)
-    # 使用实际基准预测作为分母，使水平不变模型的比率为 1。
+    # Using the actual baseline denominator makes the constant-model ratio equal to one.
     return {"a": a, "b": b, "ell0": ell0, "base_mean": base_mean,
             "week_means": week_means, "weights": weights,
             "weekday_effect": weekday_effect}
@@ -88,7 +88,7 @@ def trend_levels(fit, phi: float):
 
 
 def clipped_group_weeks(fit, phi: float):
-    """返回原始外推水平为负的组周数量及对应组索引。"""
+    'Return the number and group indices of negative projected group-weeks.'
     raw = trend_levels(fit, phi)
     mask = raw < 0
     return int(mask.sum()), np.flatnonzero(mask.any(axis=1)).tolist()
@@ -104,7 +104,7 @@ def trend_forecast(leaf_base, codes, fit, phi):
 
 
 def save_final_diagnostics(fit, labels, rhos, chosen_phi, final_model, final_phi, weekdays):
-    """保存最终起点的分组预测分量，并绘制 3×3 面板图。"""
+    'Save final-origin components and draw a 3-by-3 group panel.'
     groups = len(labels)
     linear = np.maximum(trend_levels(fit, 1.0), 0.0)
     damped = np.maximum(trend_levels(fit, chosen_phi), 0.0)
@@ -188,7 +188,7 @@ def scoring_context(metric, train, meta, calendar, prices, aggs, origin):
 
 
 def score(metric, context, forecast, aggs):
-    # 使用与 rho 选择相同的零分母处理，计算完整 12 层级 WRMSSE。
+    # Use full 12-level WRMSSE with the same zero-scale handling as rho selection.
     total = 0.0
     for lev, agg in enumerate(aggs):
         pred = np.asarray(agg @ forecast, dtype=float).reshape(agg.shape[0], 4, 7)
@@ -261,7 +261,7 @@ def main():
             del ctx, leaf_base, fit, const, legacy
         scores = pd.DataFrame(rows)
         scores.to_csv(score_path, index=False)
-    # 开发期选择 phi，确认期比较三个固定候选。
+    # Select phi on development and compare three fixed candidates on confirmation.
     dev = scores[scores.origin_d.isin(DEV)]
     phi_means = dev[dev.model == "damped"].groupby("phi").wrmsse.mean()
     chosen_phi = float(phi_means.idxmin())
@@ -288,7 +288,7 @@ def main():
                                  "phi": final_phi if final_phi is not None else np.nan,
                                  "mean_wrmsse": float(confirmation[final_model])}
     summary.to_csv(OUT / "split_summary.csv", index=False)
-    # 绘制完整滚动得分和开发期 phi 网格。
+    # Plot rolling scores and the development phi grid.
     fig, ax = plt.subplots(figsize=(9, 4.8))
     for model, phi, label, color in [("constant", None, "Constant rho baseline", "#333333"),
                                     ("linear", None, "Linear", "#d16b35"),
@@ -310,7 +310,7 @@ def main():
            title="Damping grid (first 32 rolling origins)")
     ax.grid(alpha=.25); ax.legend(frameon=False); fig.tight_layout()
     fig.savefig(OUT / "damping_grid.png", dpi=180, bbox_inches="tight"); plt.close(fig)
-    # 按确认期选定的模型生成 d_1913 起点预测。
+    # Generate the d_1913 forecast using the confirmation-selected model.
     final_release = np.where(first_release <= 1913, first_release, 10**9)
     final_leaf = rho_leaf.candidate_profile({"history": rho_leaf.weekday_history(train, 1913, final_release),
                                              "cache_namespace": "final_trend"}, codes, rhos, {})

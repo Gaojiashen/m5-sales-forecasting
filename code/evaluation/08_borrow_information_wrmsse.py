@@ -1,4 +1,4 @@
-"""比较 M5 同店其他星期与跨门店信息共享的预测效果。按目标星期的历史可靠程度分为三组，每组对 B、L_perp、X 分配和为一的权重；共报告九个权重，具有六个自由参数。"""
+'Compare local other-weekday and cross-store information borrowing on M5. Three reliability bins each assign simplex weights to B, L_perp, and X: nine reported weights and six free parameters.'
 from __future__ import annotations
 
 import importlib.util
@@ -67,13 +67,13 @@ def params_for(coef: pd.DataFrame, fold: int, labels: list[str]):
 
 
 def q_and_prior(train, meta, cal, release, origin, beta, group_codes):
-    """根据历史数据估计门店×品类的星期乘数及门店份额先验。"""
+    'Estimate historical store-category weekday multipliers and store-share priors.'
     start = max(1, origin - 363)
     days = np.arange(start, origin + 1)
     sales = np.asarray(train[:, days - 1], dtype=float)
     usable = days[None, :] >= release[:, None]
     snap_col = {"CA": "snap_CA", "TX": "snap_TX", "WI": "snap_WI"}
-    # 按底层序列所属州对齐 SNAP 标记；估计星期形状前去除 SNAP 影响和事件日期。
+    # Align SNAP by leaf state; remove SNAP effects and event dates before estimating weekday shape.
     hist_snap = np.empty_like(sales)
     for g in np.unique(group_codes):
         idx = np.flatnonzero(group_codes == g)
@@ -106,7 +106,7 @@ def q_and_prior(train, meta, cal, release, origin, beta, group_codes):
 
 
 def reliability_bins(train, release, origin, cal):
-    """按过去八个同星期的正销量次数，划分目标星期的可靠程度。"""
+    'Bin target weekdays by positive counts among the previous eight matching weekdays.'
     out = np.zeros((len(release), 7), dtype=np.int8)
     for wd in range(7):
         dow = cal.loc[origin - 1, "date"]
@@ -124,7 +124,7 @@ def reliability_bins(train, release, origin, cal):
 def local_experts(train, meta, cal, release, origin, rho, beta, gamma, rows,
                   group_codes, q, prior, store_codes, n_stores, n_cats, key_code,
                   item_codes, kappas=KAPPAS):
-    """返回当前起点的 B、L_perp 和 X 三种底层预测。"""
+    'Return B, L_perp, and X leaf forecasts for one origin.'
     b = np.zeros((len(meta), H)); l = np.zeros_like(b); x = np.zeros_like(b)
     days_out = np.arange(origin + 1, origin + H + 1)
     ev_out = event_matrix(cal.loc[days_out - 1])
@@ -141,7 +141,7 @@ def local_experts(train, meta, cal, release, origin, rho, beta, gamma, rows,
     hist_snap = np.empty_like(hist_values)
     for g, rr in enumerate(rows):
         hist_snap[rr] = cal.loc[all_days - 1, snap_col[group_state[g]]].to_numpy(float)
-    # q 的维度为门店×品类×自然星期。
+    # q has dimensions store by category by calendar weekday.
     leaf_cat = key_code % n_cats
     qhist = q[key_code[:, None], hist_wd[None, :]]
     hist_ev = event_matrix(cal.loc[all_days - 1])
@@ -158,7 +158,7 @@ def local_experts(train, meta, cal, release, origin, rho, beta, gamma, rows,
         for phase in range(7):
             ix = np.arange(phase, H, 7)
             target_wd = int(wd_out[phase])
-            # 提取同星期观测，并排除历史事件日。
+            # Extract matching weekdays and omit historical event dates.
             last = origin - 6 + phase
             hist_days = last - 7 * np.arange(8)
             valid = hist_days >= 1
@@ -168,7 +168,7 @@ def local_experts(train, meta, cal, release, origin, rho, beta, gamma, rows,
             pos = hist_days - start
             if np.any((pos < 0) | (pos >= len(all_days))):
                 continue
-            # 与 B 的同星期曲线一致：最近一次可用观测的指数为零，每向前七天，指数增加一。
+            # Match B: exponent zero for the newest eligible weekday, then one per seven-day step.
             w = np.power(float(rho[g]), np.arange(len(hist_days), dtype=float))
             hol = (cal.loc[hist_days - 1, "event_name_1"].fillna("").ne("").to_numpy() |
                    cal.loc[hist_days - 1, "event_name_2"].fillna("").ne("").to_numpy())
@@ -185,7 +185,7 @@ def local_experts(train, meta, cal, release, origin, rho, beta, gamma, rows,
             cat_codes = leaf_cat[rr]
             qtarget = q[store_codes[rr] * n_cats + cat_codes, target_wd]
             factor = np.exp(beta[g] * target_snap[g, ix] + ev_out[ix] @ gamma)
-            # L_perp 使用目标星期之外的开售后非事件日估计去星期效应的水平，再乘回目标星期的 q。
+            # Estimate L_perp from released non-event days excluding the target weekday, then restore target q.
             other_weekday = hist_wd != target_wd
             lw = hist_decay[rr] * available56[rr] * other_weekday[None, :]
             lden = lw.sum(axis=1)
@@ -195,7 +195,7 @@ def local_experts(train, meta, cal, release, origin, rho, beta, gamma, rows,
             lprof = np.where(np.isfinite(lprof), lprof, profile)
             l[rr[:, None], ix[None, :]] = lprof[:, None] * factor[None, :]
 
-    # 对全部商品门店行向量化计算跨店销量率和 H 份额；H 与跨店销量率排除所有事件日。
+    # Vectorize cross-store rates and H shares; omit all event dates from both.
     raw_available = (all_days[None, :] >= release[:, None]) & ~holiday_hist[None, :]
     hist_weight = np.power(rho[group_codes, None], (origin - all_days[None, :]) / 7.0)
     own_h = (np.where(raw_available, de, 0.0)).sum(axis=1)
@@ -221,7 +221,7 @@ def local_experts(train, meta, cal, release, origin, rho, beta, gamma, rows,
         odds = np.minimum(p / np.maximum(1.0 - p, 1e-8), MAX_SHARE_ODDS)
         x_pred = other_rate[:, None] * odds[:, None] * target_factor * qtarget
         x_by_kappa[float(kappa)] = np.where(supported[:, None], x_pred, b)
-    # 按每个目标日期的自然星期查询可靠程度分组。
+    # Look up reliability bins using each target date's calendar weekday.
     bins = bins_by_weekday[:, wd_out]
     return b, l, x_by_kappa, bins
 
@@ -244,7 +244,7 @@ def score_mixture(train, meta, prediction, origin, metric, aggs, calendar, price
 
 
 def gram_record(b, l, x, bins, train, origin, aggs, metric_parts):
-    """将一个起点压缩为各节点的 WRMSSE 二次型系数。"""
+    'Compress an origin into node-level quadratic WRMSSE coefficients.'
     scales, weights = metric_parts
     actual = np.asarray(train[:, origin:origin + H], dtype=float)
     components = [b - actual]
@@ -269,7 +269,7 @@ def gram_record(b, l, x, bins, train, origin, aggs, metric_parts):
 
 
 def score_gram(gram, weights):
-    """使用缓存的 Gram 矩阵项计算各层级 WRMSSE。"""
+    'Compute level-wise WRMSSE from cached Gram terms.'
     a = np.array([1.0, weights[0,1], weights[0,2], weights[1,1], weights[1,2],
                   weights[2,1], weights[2,2]], dtype=float)
     terms = np.array([a[i] * a[j] for i, j in gram["pairs"]], dtype=float)
@@ -281,7 +281,7 @@ def score_gram(gram, weights):
 
 
 def optimize_weights(records, kinds):
-    """基于缓存的层级 Gram 系数，优化和为一的混合权重。"""
+    'Optimize simplex weights using cached hierarchy Gram coefficients.'
     def unpack(theta):
         w = np.zeros((3, 3)); cursor = 0
         for b in range(3):
@@ -311,7 +311,7 @@ def optimize_weights(records, kinds):
 
 def plot_results(means: pd.DataFrame, scores: pd.DataFrame,
                  final_weight_rows: list[dict]):
-    """展示整体改进及跨门店信息带来的增量效果。"""
+    'Show the overall gain and the incremental cross-store contribution.'
     best_by = (means.sort_values("wrmsse")
                .drop_duplicates("candidate")
                .set_index("candidate")
@@ -405,12 +405,12 @@ def main():
     rho_final_df = pd.read_csv(RHO_DIR / "learned_rho_final.csv")
     coef_fold = pd.read_csv(CAL_DIR / "calendar_coefficients_by_fold.csv")
     coef_final = pd.read_csv(CAL_DIR / "final_calendar_coefficients.csv")
-    # 读取日历实验选择的 both 模型。
+    # Read the both-model selection from the calendar experiment.
     summary06 = json.loads((CAL_DIR / "experiment_summary.json").read_text(encoding="utf-8"))
     if summary06["selected_model_by_validation"] != "both":
         raise ValueError("Experiment 08 is specified against calendar model 'both'; 06 selected another model")
 
-    # 按折构建预测，评分后释放临时数组；各折和各 kappa 共用同一起点的 WRMSSE 缩放分母与权重。
+    # Process folds separately and release temporary forecasts; reuse origin scales and weights across kappa values.
     metric_parts_by_origin={}
     for count, origin in enumerate(ORIGINS, 1):
         metric_parts_by_origin[origin] = metric.scales_and_weights(train,meta,aggs,cal,prices,origin)[:2]
@@ -459,7 +459,7 @@ def main():
         candidate_summary.sort(key=lambda r:(r["mean_validation_wrmsse"],r["kappa"],candidate_names.index(r["candidate"])))
         best=candidate_summary[0]
         choice_rows.append({"fold":fold,"selected_kappa":best["kappa"],"selected_candidate":best["candidate"],"mean_validation_wrmsse":best["mean_validation_wrmsse"]})
-    # 核对 B 与 06 保存的验证期基准得分。
+    # Check B against the validation baseline saved by experiment 06.
     parity=pd.DataFrame(b_score_rows)
     reference=pd.read_csv(CAL_DIR/"rolling_validation_scores.csv")
     reference=reference[reference.model=="both"]
@@ -474,7 +474,7 @@ def main():
     pd.DataFrame(choice_rows).to_csv(OUT/"fold_selections.csv",index=False)
     pd.DataFrame(b_score_rows).to_csv(OUT/"baseline_parity_scores.csv",index=False)
 
-    # 按四个验证区块比较候选，并列时选择更简单的模型。
+    # Compare four validation blocks and prefer simpler candidates on ties.
     scores=pd.DataFrame(result_rows)
     rank={name:i for i,name in enumerate(candidate_names)}
     means=scores.groupby(["candidate","kappa"],as_index=False).wrmsse.mean()
@@ -482,7 +482,7 @@ def main():
     means=means.sort_values(["wrmsse","kappa","tie_rank"],kind="stable")
     best=means.iloc[0]
     final_kappa=float(best.kappa); final_candidate=str(best.candidate)
-    # 使用全部 64 个滚动起点拟合最终混合权重。
+    # Fit final mixture weights on all 64 rolling origins.
     final_rho=np.array([float(rho_final_df.loc[rho_final_df.group == lab,"rho"].iloc[0]) for lab in labels])
     beta,gamma=params_for(coef_final.assign(fold=1),1,labels)
     final_records=[]
@@ -506,7 +506,7 @@ def main():
     if not np.array_equal(reference_b.id.astype(str).to_numpy(),ref_ids.to_numpy()):
         raise AssertionError("06 forecast_both.csv IDs/order differ from metadata")
     max_final_b=float(np.max(np.abs(b-reference_b[[f"d_{d}" for d in range(1914,1942)]].to_numpy(float))))
-    # 早期脚本使用 float32 计算 rho 幂，float64 重算产生的底层预测差异小于 1e-5。
+    # Earlier rho powers use float32; float64 recomputation changes leaves by less than 1e-5.
     if max_final_b>2e-5:
         raise AssertionError(f"Final B forecast differs from 06 forecast_both.csv by {max_final_b:g}")
     forecast=b.copy()
@@ -516,7 +516,7 @@ def main():
     if not np.isfinite(forecast).all() or (forecast < -1e-10).any():
         raise AssertionError("Forecast must be finite and nonnegative")
     forecast=np.maximum(forecast,0)
-    # 将同一底层预测表经 M5 聚合矩阵汇总到各层级。
+    # Aggregate a single leaf forecast table through the M5 hierarchy matrices.
     table=pd.DataFrame(forecast,columns=[f"d_{d}" for d in target])
     table.insert(0,"id",meta.item_id.astype(str)+"_"+meta.store_id.astype(str)+"_validation")
     table.to_csv(OUT/"forecast_borrow_information.csv",index=False)

@@ -1,4 +1,4 @@
-"""诊断日历与 SNAP 模型在零销量日的预测误差。读取各验证折保存的 rho 和 both 模型系数，按 06 的公式重建底层预测，与对应的 rho 基准比较。"""
+'Diagnose zero-sales-day errors in calendar-plus-SNAP forecasts. Reconstruct leaf predictions from saved fold-specific rho and both-model coefficients, and compare with rho-only baselines.'
 from __future__ import annotations
 
 import importlib.util
@@ -43,7 +43,7 @@ def event_matrix(calendar: pd.DataFrame) -> np.ndarray:
 
 
 def cohort_labels(origin: int, first_release: np.ndarray, train: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """根据截至当前起点的最近 56 天开售后历史，划分序列稀疏程度。"""
+    'Assign sparsity cohorts from the release-aware 56-day history at each origin.'
     start = max(1, origin - 55)
     days = np.arange(start, origin + 1)
     released = first_release <= origin
@@ -62,7 +62,7 @@ def cohort_labels(origin: int, first_release: np.ndarray, train: np.ndarray) -> 
 
 
 def leaf_local(origin, rhos, beta, gamma, train, meta, first_release, cal, group_rows):
-    """重建 06 中 both 和 baseline 两种模型的底层预测。"""
+    'Reconstruct the both and baseline leaf forecasts from experiment 06.'
     state_by_group = [meta.iloc[rows[0]].state_id for rows in group_rows]
     state_snap_col = {"CA": "snap_CA", "TX": "snap_TX", "WI": "snap_WI"}
     target_days = np.arange(origin + 1, origin + 29)
@@ -133,7 +133,7 @@ def metric_row(y: np.ndarray, p: np.ndarray, origin: int, cohort: str, model: st
 
 
 def sparse_diagnostics(y: np.ndarray, p: np.ndarray, origin: int, model: str) -> tuple[list[dict], dict]:
-    """计算一个起点的无条件预测校准和高销量识别统计。"""
+    'Compute unconditional calibration and high-sales detection at one origin.'
     y = np.asarray(y, dtype=float); p = np.asarray(p, dtype=float)
     err2 = np.square(y - p); high = y >= 3
     rows = []
@@ -189,7 +189,7 @@ def main():
     rho_fold = pd.read_csv(RHO_DIR / "learned_rho_by_fold.csv")
     coef_fold = pd.read_csv(CAL_DIR / "calendar_coefficients_by_fold.csv")
 
-    # 将重建的底层预测与已保存的最终预测比较。
+    # Compare reconstructed leaves with saved final forecasts.
     rho_final = pd.read_csv(RHO_DIR / "learned_rho_final.csv")
     group_labels = [" × ".join(map(str, key)) for key in uniques]
     final_rhos = np.array([float(rho_final.set_index("group").loc[label, "rho"])
@@ -277,7 +277,7 @@ def main():
     sparse_bands = pd.DataFrame(sparse_band_rows)
     sparse_bands.to_csv(OUT / "sparse_forecast_bands_per_origin.csv", index=False)
     sparse_summary = pd.DataFrame(sparse_summary_rows)
-    # 按验证折和模型对预测排序，以预测值确定分位阈值。
+    # Rank predictions within fold and model to determine quantile cutoffs.
     fold_thresholds = {}
     for model in ("calendar_snap", "rho_baseline"):
         for fold_no in range(1, len(FOLDS) + 1):
@@ -296,17 +296,17 @@ def main():
         sparse_summary.loc[ix, "top_decile_rate_lift_vs_all"] = (
             float(high[top].mean()/high.mean()) if top.any() and high.any() else np.nan)
     sparse_summary.to_csv(OUT / "sparse_unconditional_per_origin.csv", index=False)
-    # 跨起点合并计数与总量，沿用各折的预测分位阈值。
+    # Pool counts and totals while retaining each fold's prediction-based cutoff.
     band_pooled = sparse_bands.groupby(["model", "forecast_band"], as_index=False).agg(
         observations=("observations", "sum"))
-    # 按各起点的样本数加权，合并各预测区间的均值。
+    # Combine band means using origin-specific observation counts.
     for col in ("mean_actual", "mean_forecast", "rate_y_ge_1", "rate_y_ge_3"):
         values = sparse_bands.assign(_weighted=sparse_bands[col] * sparse_bands.observations)
         agg = values.groupby(["model", "forecast_band"])._weighted.sum(min_count=1)
         band_pooled[col] = [agg.loc[(r.model, r.forecast_band)] / r.observations
                             if r.observations else np.nan for r in band_pooled.itertuples()]
     band_pooled.to_csv(OUT / "sparse_forecast_bands_pooled.csv", index=False)
-    # 按固定预测区间汇总日历与 SNAP 模型的校准结果。
+    # Pool calendar-plus-SNAP calibration by fixed forecast bands.
     calibration = (band_pooled[band_pooled.model == "calendar_snap"]
                    .set_index("forecast_band").reindex([b[2] for b in SPARSE_BANDS]))
     band_order = [b[2] for b in SPARSE_BANDS]
@@ -351,7 +351,7 @@ def main():
         total_sse=("total_sse", "sum"), forecast_sum_on_y_ge_3=("forecast_sum_on_y_ge_3", "sum"),
         top_decile_count=("top_decile_count", "sum"),
         top_decile_y_ge_3_count=("top_decile_y_ge_3_count", "sum"))
-    # 根据各起点可累加的统计量，计算加权比例和误差占比。
+    # Compute weighted rates and error shares from additive origin statistics.
     pooled_sparse["mean_actual_all"] = pooled_sparse.actual_sum_all / pooled_sparse.observations
     pooled_sparse["mean_forecast_all"] = pooled_sparse.forecast_sum_all / pooled_sparse.observations
     pooled_sparse["rate_y_ge_1_all"] = pooled_sparse.y_ge_1_count / pooled_sparse.observations
@@ -363,7 +363,7 @@ def main():
     pooled_sparse["top_decile_rate_lift_vs_all"] = pooled_sparse.top_decile_y_ge_3_rate / pooled_sparse.rate_y_ge_3_all
     pooled_sparse.to_csv(OUT / "sparse_unconditional_pooled.csv", index=False)
 
-    # 右图以全部有效序列日期单元的平方误差为分母，展示各组对总预测误差的贡献。
+    # The right panel divides cohort zero-day loss by total eligible leaf-day loss.
     order = ["zero_rate_<50%", "zero_rate_50-80%", "zero_rate_>=80%", "young_<28d"]
     short_labels = ["Mature <50%", "Mature 50–80%", "Mature ≥80%", "Young <28d"]
     chosen = pooled[pooled.cohort.isin(order)]
